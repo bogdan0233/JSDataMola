@@ -1,0 +1,641 @@
+html,body{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	
+}
+
+body{
+	background-image: url(bg.jpg);
+	background-size: cover;
+}
+
+p{
+	
+	font-family: sans-serif;
+}
+
+a{
+	color: #324CA8;
+}
+
+.header{
+	height: 3rem;
+	background-color: #E1FFFF;
+	opacity: 0.7;
+	margin: 0;
+	display: flex;
+}
+
+.main{
+	height: calc(100% - 7rem);
+	margin: 0;
+	overflow: auto;
+	position: relative;
+}
+
+.footer{
+	height: 4rem;
+	background-color: #E1FFFF;
+	opacity: 0.7;
+	margin: 0;
+	display: flex;
+}
+
+.name-of-chat{
+    width: 10rem;
+    height: 100%;
+	
+}
+
+.name-of-chat p{
+	font-size: 24px;
+	color: #324CA8;
+	margin: 0;
+	margin-top: 0.7rem;
+	margin-left: 0.7rem;
+}
+
+.name-of-user{
+	width: 20rem;
+	height: 100%;
+	text-align: center;
+	margin: 0 auto;
+	float: center;
+
+}
+
+.name-of-user p{
+	font-size: 24px;
+	color: #324CA8;
+	margin: 0;
+	margin-top: 0.7rem;
+}
+
+.exit{
+	width: 10rem;
+	height: 100%;
+	text-align: right;
+		
+	float: right;
+}
+
+.exit p{
+	
+	font-size: 24px;
+	color: #324CA8;
+	margin: 0;
+	margin-top: 0.7rem;
+	margin-right: 0.7rem;
+}
+
+
+.date-of-changes{
+	width: 10rem;
+    height: 100%;
+	text-align: center;
+	
+}
+
+.name-of-chat-1{
+	width: 10rem;
+    height: 100%;
+	text-align: center;
+	
+	margin: 0 auto;
+	float: center;
+}
+
+.data-of-author{
+	width: 10rem;
+	height: 100%;
+	text-align: left;
+	
+	
+	float: right;
+}
+
+.date-of-changes p{
+	font-size: 14px;
+	color: #324CA8;
+	margin: 0;
+	margin-top: 0.9rem;
+	margin-left: 0.7rem;
+	
+}
+
+.name-of-chat-1 p{
+	font-size: 24px;
+	color: #324CA8;
+	margin: 0;
+	margin-top: 1rem;
+}
+
+.data-of-author p{
+	font-size: 15px;
+	color: #324CA8;
+	margin: 0;
+	margin-top: 0.9rem;
+	margin-right: 1.5rem;
+}
+
+.message-box{
+	width: 60%;
+	height: 86%;
+	min-width: 40rem;
+	min-height: 30rem;
+	position: relative;
+	top: 6%; left: 20%;
+	background-color: #93CBFF;
+	opacity: 0.6;
+	border-bottom: 2px solid rgb(255, 254, 229, 1);
+}
+
+.message-box-1{
+	width: 60%;
+	height: 86%;
+	min-width: 40rem;
+	min-height: 30rem;
+	position: absolute;
+	top: 6%; left: 20%;
+	
+}
+
+.your-messages{
+	width: 100%;
+	height: 6%;
+	border-bottom: 12px solid rgb(255, 254, 229, 0.5);
+
+	text-align: center;
+	padding-top: 0.5rem;
+}
+
+
+.your-messages p{
+	margin: 0;
+	color: white;
+	font-size: 26px;
+}
+
+.common-chat{
+	width: 28%;
+	height: 90.48%;
+
+}
+
+.chat{
+	width: 72%;
+	height: 90.7%;
+	position: relative;
+	top: -90.6%; left: 28%;
+}
+
+.photo-and-chat{
+	width: 100%;
+	height: 15%;
+	border-bottom: 2px solid rgb(255, 254, 229, 0.5);
+	border-right: 2px solid rgb(255, 254, 229, 0.5);
+	display: flex;
+}
+
+.photo-and-chat img{
+	width: 2.7rem;
+	height: 2.7rem;
+	position: relative;
+	top: 19%; left: 10%;
+	margin-right: 1.9rem;
+
+}
+
+.photo-and-chat p{
+	
+	position: relative;
+	top: 12%;
+	color: white;
+	font-size: 16px;
+}
+
+.chat-users{
+	width: 100%;
+	height: 22.4%;
+	border-bottom: 2px solid rgb(255, 254, 229, 0.5);
+	border-right: 2px solid rgb(255, 254, 229, 0.5); 
+	display: flex;
+    align-items: flex-end;
+}
+
+.chat-users p{
+	color: white;
+	
+	margin: 0;
+}
+
+.users{
+	width: 100%;
+	height: 61.4%;
+	border-right: 2px solid rgb(255, 254, 229, 0.5); 
+}
+
+.user{
+	width: 100%;
+	height: 19.28%;
+	border-bottom: 2px solid rgb(255, 254, 229, 0.5);
+	display: flex;
+
+}
+
+.user img{
+	width: 20%;
+	height: 75%;
+	min-width: 2.5rem;
+	min-height: 2.5rem;
+	position: relative;
+	top: 14%; left: 5%;
+	margin-right: 1.3rem;
+
+}
+
+.user p{
+	color: white;
+	
+}
+
+.infa{
+	width: 100%;
+	height: 15%;
+	display: flex;
+	border-bottom: 2px solid rgb(255, 254, 229, 0.5);
+}
+
+.photo-and-chat-1{
+	width: 45%;
+	height: 100%;
+	display: flex;
+}
+
+.photo-and-chat-1 img{
+	width: 2.7rem;
+	height: 2.7rem;
+	position: relative;
+	top: 19%; left: 8%;
+	margin-right: 2.0rem;
+}
+
+.photo-and-chat-1 p{
+	color: white;
+	font-size: 20px;
+}
+
+.number-of-users{
+	width: 40%;
+	height: 100%;
+	font-size: 12px;
+	display: flex;
+}
+
+.number-of-users p{
+	position: relative;
+	top: 20%; left: 0%;	
+	color: white;
+}
+
+.filters{
+	width: 20%;
+	height: 100%;
+	
+}
+
+.button-1{
+	float: right;
+	margin-right: 1rem;
+	position: relative;
+	top: 35%;
+	background-color: #F7FFE5;
+	outline: 0 !important;
+}
+
+.button-1 p{
+	margin: 0;
+}
+
+.chat-box{
+	width: 100%;
+	height: 72.5%;
+	overflow:hidden;
+}
+
+.send{
+	width: 100%;
+	height: 11.4%;
+	border-top: 2px solid rgb(255, 254, 229, 0.5);
+	display: flex;
+}
+
+.send-box{
+	width: 84%;
+	height: 100%;
+	padding: 0;
+	opacity: 0.7;
+	margin-left: 2px;
+	border: 0;
+	outline: 0 !important;
+	border-radius: 0;
+	background-color: #F7FFE5;
+}
+
+.button-2{
+	position: relative;
+	top: 0%; left: 0%;
+	width: 16%;
+	border-radius: 0;
+	border: 0;
+	background: linear-gradient(0deg, #F7FFC3, #A0FFB0);
+	outline: 0 !important;
+}
+
+.download-more{
+	width: 100%;
+	height: 6%;
+	position: relative;
+	top: 2%; 
+	text-align: center;
+
+}
+
+.button-4{
+	background-color:  #819CFF;
+	color: white;
+	border: 1px solid #3F61DA;	
+	outline: 0 !important;
+	z-index: 3;
+}
+
+.button-4 p{
+	margin: 0;
+}
+
+.message{
+	margin-top:1.2rem;
+	margin-left: 0.6rem;
+	height: 9%;
+}
+
+.text-message{
+	background-color: #F7FFE5;
+	opacity: 0.9;
+	
+	min-width: 5.9rem;
+	
+	padding: 0.4rem;
+	border-radius: 10px 0 10px 0;
+}
+
+.text-message p{
+	margin: 0;
+	font-size: 15px;
+}
+
+
+.date-and-name{
+
+}
+
+.date-and-name p{
+	margin: 0;
+	font-size: 11px;
+	opacity: 0.7;
+}
+
+.your-message{
+	margin-top:1.5rem;
+	margin-right: 0.6rem;
+	height: 9%;
+}
+
+.your-text-message{
+	background-color: #F7FFE5;
+	opacity: 0.9;
+	width: 10%;
+	min-width: 3.3rem;
+	text-align: right;
+	padding-top: 0.4rem;
+	padding-right: 0.4rem;
+	padding-left: 0.4rem;
+	border-radius: 0 10px 0 10px;
+	float: right;
+	border: 0;
+
+}
+
+.your-text-message img{
+	width: 1.5rem;
+	height: 0.5rem;
+	float: right;
+}
+
+.your-text-message p{
+	margin: 0;
+	font-size: 15px;
+}
+
+
+.your-date-and-name{
+	float: right;
+}
+
+.your-date-and-name p{
+	margin: 0;
+	font-size: 11px;
+	opacity: 0.7;
+}
+
+.mess{
+	float:right;
+	width: 20%;
+	height: 100%;
+	min-width: 129px;
+}
+
+#m-1{
+	width: 50%;
+}
+#tm-1{
+	width: 1rem;
+}
+
+.edit{
+	width: 5rem;
+	height: 4rem;
+	background-color: white;
+}
+
+#m-3{
+	width: 20%;
+	min-width: 140px;
+}
+
+.today p{
+	color: #F7FFE5;
+	font-size: 20px;
+	text-align: center;
+}
+
+#tm-4{
+	width: 12rem;
+}
+
+#tm-5{
+	width: 12rem;
+	margin-top: 1rem;
+}
+
+
+.active-users{
+	 margin-left: auto;
+}
+
+.active-users p{
+		font-size: 13px;
+		width: 5rem;
+		margin-left: 0.9rem;
+
+		
+}
+
+.active-users-1{
+	height: 10rem;
+	width: 6rem;
+	background-color: #E7F8FF;
+	border: 1px solid #4E75FF;
+	display: none;
+	z-index: 4;
+}
+
+.online{
+	height: 20%;
+	position: relative;
+	top: 0%;
+}
+
+.online p{
+	color: #324CA8;
+	font-size: 18px;
+	margin: 0;
+	margin-left: 0.5rem;
+}
+
+.active-user{
+	width: 100%;
+	height: 20%;
+	display: inline-flex;
+}
+
+.active-user p{
+	color: black;
+	margin: 0;
+	font-size: 16.5px;
+	margin-left: 0.3rem;
+	width: 60%;
+} 
+
+.active-user img{
+	width: 1rem;
+	height: 1rem;
+	float: right;
+	margin-left: 0.7rem;
+	margin-top: 0.5rem;
+}
+
+.butt{
+	width: 0.1rem;
+	height: 0.1rem;
+	position: relative;
+	top: 34%;
+	float: right;
+
+}
+
+.butt-1{
+	width: 11rem;
+	height: 7.5rem;
+	background-color: #E7F8FF;
+	border: 1px solid #4E75FF;
+	display: none;
+	position: relative;
+	top:100%; left: -8000%;
+	float: left;
+}
+
+.filt-date{
+	height: 25%;
+	width: 100%;
+	display: inline-flex;
+}
+
+.filt-date p{
+	margin: 0;
+	margin-top: 0.5rem;
+	margin-left: 0.3rem;
+}	
+
+.ok{
+	float: right;
+	margin-top: 0.3rem;
+	margin-right: 0.4rem;
+	border: 0;
+	background-color: #D3E5FF;
+}
+
+.inp{
+	width: 60%;
+	height: 70%;
+	margin-top: 0.2rem;
+}
+
+#inp-1{
+	margin-left: 0.85rem;
+	width: 61%;
+	height: 73%;
+}
+
+
+#inp-2{
+	margin-left: 1.15rem;
+}
+
+.onl-user{
+	width: 10px; 
+	height: 10px;
+	background: black;
+	border-radius: 50%;
+	margin-left: auto;
+	background-color: #D3FFEF;
+	position: relative;
+	top: 40%;
+	margin-right: 1rem;
+}
+
+
+
+.active-users:hover .active-users-1{
+	display: block;
+}
+
+.butt:hover .butt-1{
+	display: block;
+}
+
+.button-2:hover{
+	font-size: 18px;
+}
+
+.button-4:active{
+	color: blue;
+}
+
+.button-2:active{
+	background: linear-gradient(0deg, #A0FFB0, #F7FFC3);
+	color: white;
+}
+
