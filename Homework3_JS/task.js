@@ -1,3 +1,6 @@
+'use strict';
+const myModule = (function(){
+
 const messages = [
   {
      id: '1',
@@ -152,110 +155,29 @@ const messages = [
 ];
 
 
-for (index = 0; index < messages.length; ++index) {
-  if(messages[index].text.length > 200)
-    messages[index].text.substr(200, Infinity);
-}
-
-obj={
+let obj={
   author: null,
   dateFrom: null,
   dateTo: null,
   text: null
 }
 
-//Вспомогательные методы для функции getMessages
-function filterByDate(arr2, obj1){
-  
-  if(obj1.dateTo !== undefined || obj1.dateFrom !== undefined){
-    let arr3=[];
-    let k = 0;
-    if(obj1.dateTo!== undefined && obj1.dateFrom!== undefined){
-      for (index = 0; index < arr2.length; ++index) {
-        if(arr2[index].createdAt > obj1.dateFrom && arr2[index].createdAt < obj1.dateTo){
-          arr3.push(arr2[index]);
-        }
-      }
-      k++;
-    }
-
-    if(obj1.dateTo!== undefined && k === 0){
-      for (index = 0; index < arr2.length; ++index) {
-        if(arr2[index].createdAt < obj1.dateTo) {
-          arr3.push(arr2[index]);          
-        }
-      }
-
-      k++;
-    }
-
-    if(obj1.dateFrom!== undefined && k === 0){
-      for (index = 0; index < arr2.length; ++index) {
-        if(arr2[index].createdAt > obj1.dateFrom){
-          arr3.push(arr2[index]);          
-        }
-      }
-
-    }
-
-    return arr3;
-  }else{
-    return arr2;
-  }
-  
- 
-}
-
-function filterByAuthor(arr2, obj1){ 
-  if(obj1.author !== undefined){
-    let arr3=[];
-    for (index = 0; index < arr2.length; ++index) {
-      if(arr2[index].author.includes(obj1.author)){
-        arr3.push(arr2[index]);
-      }
-    }
-    return arr3;
-  }else{
-    return arr2;
-  }
-}
-
-function filterByText(arr2, obj1){
-  if(obj1.text !== undefined){
-    let arr3=[];
-    for (index = 0; index < arr2.length; ++index) {
-      if(arr2[index].text.includes(obj1.text)){
-        arr3.push(arr2[index]);
-      }
-    }
-    
-    return arr3; 
-  }else{
-    return arr2;
-  }
-}
-
 function getMessages(begin = 0, count = 10, obj1 = {}){
-  let arr1 = [];
-  
-  for (index = 0; index < messages.length; ++index) {
-    arr1[index] = messages[index];
-  }
+  let arr1 = [...messages];
 
-  arr1 = filterByAuthor(arr1, obj1); 
-  arr1 = filterByText(arr1, obj1);
-  arr1 = filterByDate(arr1, obj1);
-  
-  arr1.sort((prev, next) => prev.createdAt - next.createdAt);
+  if(obj1.author !== undefined)
+     arr1 = arr1.filter((item) => item.author.toLowerCase().includes(obj1.author.toLowerCase()));
 
-  for (index = 0; index < begin; ++index) {
-      arr1.shift(messages[index]);
-  }
+  if(obj1.text !== undefined)
+    arr1 = arr1.filter((item) => item.text.toLowerCase().includes(obj1.text.toLowerCase()));
 
-  while( arr1.length > count){
-    arr1.pop(arr1[arr1.length-1]);
-  }
-  return arr1;
+  if(obj1.dateTo === undefined)
+    obj1.dateTo = new Date('2030-04-07T14:23:00');
+  if(obj1.dateFrom === undefined)
+    obj1.dateFrom = new Date('1981-04-07T14:23:00');
+  arr1 = arr1.filter((item) => item.createdAt < obj1.dateTo && item.createdAt > obj1.dateFrom); 
+
+  return arr1.sort((prev, next) => next.createdAt - prev.createdAt).slice(begin, begin+count);;
 }
 
 console.log('Function getMessages');
@@ -266,7 +188,7 @@ console.log(example1);
 let example2 = getMessages(0, 10, {author: 'Федор', text: 'дом',  dateTo: new Date('2017-04-07T14:23:00') } );
 console.log(example2);
 
-let example3 = getMessages(0, 7, {author: 'Иван', dateFrom: new Date('2010-04-07T14:23:00'), dateTo: new Date('2017-04-07T14:23:00')});
+let example3 = getMessages(0, 7, {author: 'Иван', dateFrom: new Date('2009-04-07T14:23:00'), dateTo: new Date('2018-04-07T14:23:00')});
 console.log(example3);
 
 let example4 = getMessages(0, 7, {author: 'Петр', text:'дел', dateFrom: new Date('2010-04-07T14:23:00'), dateTo: new Date('2021-04-07T14:23:00')});
@@ -274,24 +196,15 @@ console.log(example4);
 
 console.log(messages);
 
-
-////////////
+//////////////////////
 
 console.log('Function getMessage');
 
 function getMessage(id) {
-	
-  let check = true;
-
-	for (index = 0; index < messages.length; ++index) {
- 		if(messages[index].id===id){
-      check = false;
-			return messages[index].text;
- 		}
-  }
-
-  if(check === true)
-    console.log('Данный id не найден.');
+  if(messages.find(item => item.id === id) !== undefined)
+    return messages.find(item => item.id === id).text;
+  else
+    console.log('Данный id не обнаружен.');
 }
 
 let example5 = getMessage('3');
@@ -306,11 +219,12 @@ console.log('Function validateMessage');
 
 function validateMessage(msg){
 
-	if(msg.id!== undefined && (typeof msg.id === typeof 'hi') && msg.text!== undefined && (typeof msg.text === typeof 'hi') && msg.createdAt!== undefined && (typeof msg.createdAt === typeof new Date()) && msg.author!== undefined && (typeof msg.author === typeof 'hi') && msg.isPersonal !== undefined && (typeof msg.isPersonal === typeof true)){
-		return true;
-	}else{
-		return false;
+	if(msg.id!== undefined && (typeof msg.id === typeof 'hi') && msg.text!== undefined && msg.text.length < 200 && (typeof msg.text === typeof 'hi') && msg.createdAt!== undefined && (typeof msg.createdAt === typeof new Date()) && msg.author!== undefined && (typeof msg.author === typeof 'hi') && msg.isPersonal !== undefined && (typeof msg.isPersonal === typeof true)){
+		if((msg.isPersonal === true && (msg.to === undefined || (typeof msg.to !== typeof 'hi'))) || (msg.isPersonal === false && msg.to !== undefined))
+      return false;
+    return true;
 	}
+  return false;
 }
 
 let example7 = validateMessage(messages[0]);
@@ -333,30 +247,30 @@ console.log(example8);
 console.log('Function addMessage');
 
 let a = {
-  id : '56',
-  text : 'Я изучаю JS',
-  createdAt : new Date(),
-  author: 'Насекайло Богдан',
-  isPersonal: true
+  text: 'Давай встретимся',
+  isPersonal: false,
 }
 
-// В данном объкте пропущено поле text
+// В данном объкте пропущено поле to
 let b = {
-  id : '56',
-  createdAt : new Date(),
-  author: 'Насекайло Богдан',
-  isPersonal: true
+  text: 'Всем добрый вечер!',
+  isPersonal: true,
+ 
 }
 
-function addMessage(msg){
+const nameOfUser = 'Насекайло Богдан';
 
-    if(validateMessage(msg)){
-      messages.push(msg);  
+function addMessage(messObj){
+    messObj.id = String(+messages[messages.length-1].id + 1);
+    messObj.createdAt = new Date();
+    messObj.author = nameOfUser;
+
+    if(validateMessage(messObj)){
+      messages.push(messObj);  
     	return true;
-    }else{
-    	return false;
     }
-	
+
+  	return false;
 }
 
 let example9 = addMessage(a);
@@ -367,7 +281,7 @@ console.log(example10);
 
 /////////////////
 
-object1={
+let object1={
   text: null,
   isPersonal: null,
   to: null
@@ -375,41 +289,53 @@ object1={
 
 console.log('Function editMessage');
 
-function editMessage( id, msg = {}){
-	for (index = 0; index < messages.length; ++index) {
-    	if(messages[index].id===id){
-    		if (validateMessage(messages[index])){
-    			messages[index].text = msg.text;
-    			return true;
-    		}else{
-    			return false;
-    		} 			
-   		}
-    }
+function editMessage(id , msg = {}){
+
+  let mess = messages.find(item => item.id === id);
+
+  if(msg.text !== undefined)
+    mess.text = msg.text;
+
+  if(msg.isPersonal !== undefined)
+    mess.isPersonal = msg.isPersonal;
+
+  if(msg.to !== undefined)
+    mess.to = msg.to;
+
+  if(validateMessage(mess))
+    return true;
+
+  return false;
 
 }
 
 let edit = editMessage('1', { text: 'GoodBye'});
 console.log(edit);
-console.log(messages[0]);
+
+let edit1 = editMessage('17', { isPersonal: true, to: 'Леха Леухин'});
+console.log(edit1);
+
+//Пропущено поле to  при isPersonal true
+let edit2 = editMessage('4', { isPersonal: true});
+console.log(edit2);
+
+console.log(messages);
 
 //////////////////
 
 console.log('Function removeMessage');
 
 function removeMessage(id){
-  let check1 = true;
-  for (index = 0; index < messages.length; ++index) {
-      if(messages[index].id===id){
-        check1 = false;
-        messages.splice(index, 1);
-      }
-  }
-  if(check1 === true)
-    console.log('Данный id не найден')
+  
+  if(messages.findIndex((item, index) => item.id === id) !== -1)
+    messages.splice(messages.findIndex((item, index) => item.id === id), 1);
+  else 
+    console.log('Данный id не найден');
 }
 
 removeMessage('5');
-removeMessage('8');
+removeMessage('10');
 removeMessage('678');
 console.log(messages);
+
+})();
