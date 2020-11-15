@@ -1,0 +1,268 @@
+a{
+	color: blue;
+}
+.box{
+	border: 1px solid black;
+	width: 53rem;
+	height: 26rem;
+	margin-bottom: 1rem;
+}
+
+.photo{
+	width: 12rem;
+	height: 12rem;
+	position: relative;
+	top: 5%; left: 3%;
+	float: left;
+}
+
+.photo img{
+	width: 12rem;
+	height: 12rem;
+	border-radius: 5px;
+}
+
+.name-of-hotel{
+	margin-top: 1.5rem;
+	margin-left: 15rem;
+	width: 10rem;
+}
+
+.name-of-hotel p{
+	color: #2B8DE7;
+	font-size: 25px;
+	font-family: sans-serif;
+	margin-bottom: 0;
+
+}
+
+.mark{
+	float: right;
+	margin-right: 2rem;
+	height: 6rem;
+	width: 12rem;
+}
+
+.box-1{
+	float:left;
+	margin-left: 1.9rem;
+}
+
+.reviews{
+	float: bottom;
+
+}
+
+
+.wonderful p{
+	font-size: 23px;
+	color: #2B8DE7;
+	margin-bottom: 0;
+}
+
+.reviews p{
+	opacity: 0.7;
+	margin: 0;
+}
+
+.mark-1{
+	background-color: blue;
+	width: 2.7rem;
+	height: 2.7rem;
+	border-radius: 5px 5px 5px 0;
+	text-align: center;
+	float: right;
+	margin-top: 1.6rem;
+}
+.mark-1 p{
+	font-size: 22px;
+	color: white;
+	margin: 0;
+	margin-top: 0.6rem;
+}
+
+.villas-name{
+	margin-left: 3.7rem;
+}
+.stars{
+	margin-left: 15rem;
+	height: 2rem;
+	width: 20rem;
+	
+}
+
+.stars img{
+	width: 6rem;
+	height: 1.8rem;
+
+}
+
+.villas{
+	float: left;
+	background-color: green ;
+	color: white;
+	padding: 0.2rem;
+	margin-left: 3.0rem;
+	border-radius: 3px;
+}
+#stars-1{
+	position: relative;
+	top: -85%; left: 17%;
+}
+
+.image{
+	width: 7rem;
+}
+
+.name-genius{
+	height: 2rem;
+
+}
+
+.genius{
+	width: 3.2rem;
+	height: 1.6rem;
+	background-color: blue;
+	text-align: center;
+	border-radius: 3px;
+	
+	position: relative;
+	top: -98%; left: 33%;
+}
+
+.genius p{
+	
+	color: white;
+	margin: 0 auto;
+	margin-top: 0.1rem;
+
+}
+
+.map{
+	margin-left: 15rem;
+}
+
+.recommended{
+	margin-left: 15rem;
+	padding: 0.4rem;
+	background-color: #E3F2FF;
+	margin-top: 1.2rem;
+	margin-right: 1rem;
+}
+.photo-1{
+	width: 3.0rem;
+	height: 1.3rem;
+	margin-top: 1rem;
+	margin-left: 15rem;
+}
+
+.photo-1 img{
+	width: 3.0rem;
+	height: 1.3rem;	
+}
+
+.description{
+	height: 2rem;
+}
+.suite{
+	position: relative;
+	top: -99%; left: 36%;
+}
+
+#suite-1{
+	position: relative;
+	top: -100%; left: 13%;
+}
+
+.suite-2{
+height: 2rem;
+}
+
+.suite p{
+	color: #2B8DE7;
+}	
+
+.entire{
+	width: 28rem;
+	height: 5rem;
+	margin-left: 19rem;
+	font-family: sans-serif;
+	font-size: 15px;
+}
+.entire p{
+	margin: 0;
+	color: green;
+	font-size: 14px;
+}
+
+.entire pre{
+	margin: 0;
+	font-family: sans-serif;
+	color: red;
+	font-size: 14px;
+}
+
+.nights{
+	width: 12rem;
+	height: 5rem;
+	float: right;
+	text-align: right;
+	margin-right: 1rem;
+	color: grey;
+}
+
+.nights p{
+	color: black;
+	margin: 0;
+	width: 5rem;
+}
+
+.button-1 {
+	margin-left: 42rem;
+	margin-top: 3rem;
+}
+
+.see-availability{
+	width: 10rem;
+	height: 2.5rem;
+	background-color: #2B8DE7;
+	border: 0;
+	color: white;
+	font-size: 17px;
+}
+
+#see{
+	margin-top: 1.5rem;
+}
+
+.breakfast-included{
+	width: 9rem;
+	background-color: green;
+	color: white;
+	font-family: sans-serif;
+	font-size: 14px;
+	padding: 0.2rem;
+	position: relative;
+	top: -87%; left: 2%;
+	text-align: center;
+	border-radius: 3px 3px 3px 0; 
+	box-shadow: 2px 2px black;
+}
+
+.triangle{
+	width: 0; 
+	height: 0;
+	border-top: 0.6rem solid green;
+	border-left: 0.55rem solid transparent;
+	position: relative;
+	top: -87%; left: 2%;
+}
+
+.see-availability:hover {
+	background-color: blue;
+}
+
+.name-of-hotel:hover p{
+	color: #AD5A5A;
+}
+
