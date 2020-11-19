@@ -11,21 +11,42 @@ class Message{
       this._to = undefined;
   }
 
-  get id_info(){
+  get id(){
     return this._id;
   }
 
-  set id_info(id){
-    this._id = id;
-  }
-
-  get CreatedAt_info(){
+  get createdAt(){
     return this._createdAt;
   }
 
-  set CreatedAt_info(createdAt){
-    this._createdAt = createdAt;
+  get to(){
+    return this._to;
   }
+
+  get author(){
+    return this._author;
+  }
+
+  get isPersonal(){
+    return this._isPersonal;
+  }
+
+  get text(){
+    return this._text;
+  }
+
+  set text(text){
+    this._text = text;
+  }
+  
+  set isPersonal(isPersonal){
+    this._isPersonal = isPersonal;
+  }
+
+  set to(to){
+    return this._to = to;;
+  }
+
 }
 
 
@@ -48,33 +69,33 @@ class MessageList{
     let arr1 = [...this._arrOfMessages];
 
     if(obj1.author !== undefined)
-      arr1 = arr1.filter((item) => item._author.toLowerCase().includes(obj1.author.toLowerCase()));
+      arr1 = arr1.filter((item) => item.author.toLowerCase().includes(obj1.author.toLowerCase()));
    
     if(obj1.text !== undefined)
-      arr1 = arr1.filter((item) => item._text.toLowerCase().includes(obj1.text.toLowerCase()));
+      arr1 = arr1.filter((item) => item.text.toLowerCase().includes(obj1.text.toLowerCase()));
       
     if(obj1.dateTo !== undefined)
-      arr1 = arr1.filter((item) => item._createdAt < obj1.dateTo);
+      arr1 = arr1.filter((item) => item.createdAt < obj1.dateTo);
 
     if(obj1.dateFrom !== undefined)
-      arr1 = arr1.filter((item) => item._createdAt > obj1.dateFrom); 
+      arr1 = arr1.filter((item) => item.createdAt > obj1.dateFrom); 
 
-    arr1 = arr1.filter((item) => (item._author === this._user || item._to === this._user || item._isPersonal === false));
+    arr1 = arr1.filter((item) => (item.author === this._user || item.to === this.user || item.isPersonal === false));
 
-    return arr1.sort((prev, next) => next._createdAt - prev._createdAt).slice(begin, begin + count);
+    return arr1.sort((prev, next) => next.createdAt - prev.createdAt).slice(begin, begin + count);
   }
 
   validate(msg){
-    if(msg._id!== undefined && (typeof msg._id === typeof 'hi') && msg._text!== undefined  && (typeof msg._text === typeof 'hi') && msg._text.length < 200 && msg._createdAt!== undefined && (typeof msg._createdAt === typeof new Date()) && msg._author!== undefined && (typeof msg._author === typeof 'hi') && msg._isPersonal !== undefined && (typeof msg._isPersonal === typeof true)){
-    return true;
-  }
-  return false;
+    if(msg._id!== undefined && (typeof msg._id === 'string') && msg._text!== undefined  && (typeof msg._text === 'string') && msg._text.length < 200 && msg._createdAt!== undefined && (typeof msg._createdAt === 'object') && msg._author!== undefined && (typeof msg._author === 'string') && msg._isPersonal !== undefined && (typeof msg._isPersonal === 'boolean')){
+      return true;
+    }
+    return false;
   }
 
   get(id){
-    let mess = this._arrOfMessages.find(item => item._id === id);
+    let mess = this._arrOfMessages.find(item => item.id === id);
     if(mess !== undefined)
-      return mess._text;
+      return mess;
     else
       console.log('Данный id не обнаружен.');
   }
@@ -82,12 +103,16 @@ class MessageList{
   add(messObj){
     let max = Number(this._arrOfMessages[0]._id);
     this._arrOfMessages.forEach(function(item){
-      if(max < Number(item._id))
-        max = Number(item._id);
+      if(max < Number(item.id))
+        max = Number(item.id);
     });
-    messObj._id = String(+max + 1);
-    messObj._createdAt = new Date();
-    messObj._author = this._user;
+    let id = String(+max + 1);
+    let createdAt = new Date();
+    let author = this._user;
+    let text = messObj.text;
+    let isPersonal = messObj.isPersonal;
+
+    messObj = new Message(id, text, author, createdAt, isPersonal);
 
     if(this.validate(messObj)){
       this._arrOfMessages.push(messObj);  
@@ -99,26 +124,28 @@ class MessageList{
 
   edit( id, msg = {}){
 
-    let index = this._arrOfMessages.findIndex((item, index) => item._id === id);
+    let index = this._arrOfMessages.findIndex((item, index) => item.id === id);
       
     if( this._arrOfMessages[index]._author !== this._user){
       console.log("Вы не автор данного сообщения");
       return false;
     }
-    let mess =  this._arrOfMessages.find(item => item._id === id);
+    let mess =  this._arrOfMessages.find(item => item.id === id);
 
     let secondMess = {};
     for(let key in mess)
       secondMess[key]=mess[key];
 
     if(msg.text !== undefined)
-      secondMess._text = msg.text;
+      secondMess.text = msg.text;
 
     if(msg.isPersonal !== undefined)
-      secondMess._isPersonal = msg.isPersonal;
+      secondMess.isPersonal = msg.isPersonal;
 
     if(msg.to !== undefined)
-      secondMess._to = msg.to;
+      secondMess.to = msg.to;
+
+    console.log(secondMess);
 
     if(this.validate(secondMess)){
       for( let key in secondMess)
@@ -132,13 +159,13 @@ class MessageList{
   }
 
   remove(id){
-    let index = this._arrOfMessages.findIndex((item, index) => item._id === id);
+    let index = this._arrOfMessages.findIndex((item, index) => item.id === id);
     if(index !== -1){
-      if( this._arrOfMessages[index]._author !== this._user){
+      if( this._arrOfMessages[index].author !== this._user){
         console.log("Вы не автор данного сообщения");
         return false;
       }
-      this._arrOfMessages.splice(this._arrOfMessages.findIndex((item, index) => item._id === id), 1);
+      this._arrOfMessages.splice(this._arrOfMessages.findIndex((item, index) => item.id === id), 1);
       return true;  
     }
     else 
@@ -199,7 +226,7 @@ console.log(example10);
 
 console.log('Function add');
 
-let mess4 = new Message(null, 'Hi', null, null, true);
+let mess4 = { text: 'bbbbbbb', isPersonal: true};
 let example20 = messages1.add(mess4);
 console.log(example20);
 
