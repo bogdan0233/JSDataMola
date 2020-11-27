@@ -5,13 +5,23 @@ function createCalendar(cal, year, month){
 	let k = 0;
 	let t = 0;
 	let r = 1;
+	let p = 0;
+	let a = 0;
 	while(date.getMonth() === month){
 		date.setDate(date.getDate() + 1);
 		k++;
 	}
-	let s = date.getDay() + 7;
+	date.setMonth(date.getMonth() - 1);
+	date.setDate(1);
+	let s = date.getDay() + 6;
+	p = s;
+	if(date.getDay() === 0)
+		a = 7;
+	else
+		a = date.getDay();
 	let table = document.createElement('table');
-	while(t < k + date.getDay() + 7){
+	while(t < k + a + 6){
+
 		let tr = document.createElement('tr');
 		for( let i = 0; i < 7; i++){
 			let td = document.createElement('td');
@@ -41,11 +51,18 @@ function createCalendar(cal, year, month){
 			  default:
 			    break;
 			}
-			if( t === s && r < k){
-				td.innerHTML= r;
-				r++;
+			if( t === p && r <= k ){
+				if(s === 6){
+					p+= 7;
+				}else{
+					td.innerHTML= r;
+					r++;
+					p++;
+					
+				}				
 				s++;
 			}
+
 			tr.appendChild(td);
 			t++;
 		}
@@ -57,4 +74,4 @@ function createCalendar(cal, year, month){
 	cal.appendChild(table);
 }
 
-createCalendar(elem, 2012, 6);
+createCalendar(elem, 2020, 10);
