@@ -49,15 +49,17 @@ class Message{
 
 }
 
-class chatController{
-  constructor(model, user, messages, active, personal, header1){
-    this.model = model;
-    this.userList = user;
-    this.messagesView = messages;
-    this.activeUsersView = active; 
-    this.personalUsersView = personal;
-    this.header = header1; 
+class ChatController{
+  constructor(){
+    this.model = new Model(messages);
+    this.view = new MessagesView('chat-box-1');
+    this.userList = new UserList(['Dima', 'Zhenya Zh.', 'Zhenya H.', 'Sasha', 'Pasha', 'Masha', 'Kasha'], ['Dima', 'Zhenya', 'Vlad', 'Nastya', 'Kolya']);
+    this.active = new ActiveUsersView('checkmark1');
+    this.persUsView = new PersonalUsersView('users');
+    this.header = new HeaderView('user-name');
   }
+
+  k = 10;
 
   addMessage(obj = {}, model, view){
     let text = document.getElementById('input').value;
@@ -76,10 +78,12 @@ class chatController{
 
   filter(begin = 0, count = 10, model, view, obj = {}){
     console.log(document.getElementById('inp-2'));
-    if(document.getElementById('inp-2') !== null)
+    if(document.getElementById('inp-2') !== null){
       obj.dateTo = document.getElementById('inp-2').valueAsNumber;
-    if(document.getElementById('inp-1') !== null)
+    }
+    if(document.getElementById('inp-1') !== null){
       obj.dateFrom = document.getElementById('inp-1').valueAsNumber;
+    }
     obj.author = document.getElementById('inp-4').value;
     obj.text = document.getElementById('inp-3').value;
     console.log(obj);
@@ -87,8 +91,6 @@ class chatController{
 
   }
 
-  
-  k = 10;
   downloadMoreMessages(view, model){
       view.display(model.getPage(0, this.k + 10, {})); 
       this.k+=10;
@@ -97,7 +99,9 @@ class chatController{
   save(model, view){
         for(let uk = 0; uk < localStorage.length; uk++){
           let key = localStorage.key(uk);
-          console.log(key);
+          if(key === 'author'){
+            continue;
+          }
           let mess = localStorage.getItem(key);
           let a = JSON.parse(mess);
           a._createdAt = new Date(a._createdAt);
@@ -106,10 +110,13 @@ class chatController{
           model.add(mess1);
           view.display(model.getPage());
         }
+        let auth = localStorage.getItem('author');
+        setCurrentUser(auth);
   }
 
   edit(model){
-    document.addEventListener('click', ({ target: t }) => {
+    let cont = document.getElementById('chat-box-1');
+    cont.addEventListener('click', ({ target: t }) => {
     if (t.tagName === 'BUTTON' && t.textContent ==='Edit') {
     //cotroller.editMessage( t.parentElement.parentElement, view, model);
       let div = t.parentElement.parentElement;
@@ -140,7 +147,8 @@ class chatController{
   }
 
   removeMessage( model, view ){
-    document.addEventListener('click', ({ target: t }) => {
+    let cont = document.getElementById('chat-box-1');
+    cont.addEventListener('click', ({ target: t }) => {
     if (t.tagName === 'BUTTON' && t.textContent ==='Delete') {
         let div = t.parentElement.parentElement;
         model.remove(div.id);
@@ -170,34 +178,34 @@ class Model{
   getPage(begin = 0, count = 10, obj1 = {}){
     let arr1 = [...this.arrOfMessages];
 
-    if(obj1.author !== "" && obj1.author !== undefined)
+    if(obj1.author !== "" && obj1.author !== undefined){
       arr1 = arr1.filter((item) => item.author.toLowerCase().includes(obj1.author.toLowerCase()));
+    }
    
-    if(obj1.text !== "" && obj1.text !== undefined)
+    if(obj1.text !== "" && obj1.text !== undefined){
       arr1 = arr1.filter((item) => item.text.toLowerCase().includes(obj1.text.toLowerCase()));
-    console.log(arr1);
+    }
 
     if(obj1.dateTo > 0){
       arr1 = arr1.filter((item) => item.createdAt.getTime() < obj1.dateTo);
       console.log(obj1.dateTo);
     }
-    console.log(arr1);
 
     if(obj1.dateFrom > 0){
-      console.log('2');
       arr1 = arr1.filter((item) => item.createdAt.getTime() > obj1.dateFrom); 
     }
     console.log(arr1);
     arr1 = arr1.filter((item) => (item.author === this.user || item.to === this.user || item.isPersonal === false));
-    console.log(arr1);
+  
     return arr1.sort((prev, next) => next.createdAt - prev.createdAt).slice(begin, begin + count);
    }
 
     add(messObj){
     let max = Number(this.arrOfMessages[0].id);
     this.arrOfMessages.forEach(function(item){
-      if(max < Number(item.id))
+      if(max < Number(item.id)){
         max = Number(item.id);
+      }
     });
     let id = String(+max + 1);
     let createdAt;
@@ -207,7 +215,12 @@ class Model{
     }
     else
       createdAt = new Date();
-    let author = this.user;
+    let author;
+    if(messObj.author !== undefined){
+      author = messObj.author;
+    }else{
+      author = this.user;
+    }
     let text = messObj.text;
     let isPersonal = messObj.isPersonal;
 
@@ -250,20 +263,24 @@ class Model{
       for(let key in mess)
         secondMess[key]=mess[key];
 
-      if(msg.text !== undefined)
+      if(msg.text !== undefined){
         secondMess._text = msg.text;
+      }
 
-      if(msg.isPersonal !== undefined)
+      if(msg.isPersonal !== undefined){
         secondMess._isPersonal = msg.isPersonal;
+      }
 
-      if(msg.to !== undefined)
+      if(msg.to !== undefined){
         secondMess._to = msg.to;
+      }
 
       console.log(secondMess);
 
   
-      for( let key in secondMess)
+      for( let key in secondMess){
         mess[key]=secondMess[key];
+      }
        return true;
     }
 }
@@ -299,7 +316,7 @@ class MessagesView{
     for(let i = 0; i < arr.length; i++)
       this.list.removeChild(arr[i]);//чистим наше окно с сообщениями, чтобы заполнить его новыми
     for(let i = msgs.length - 1; i >= 0; i--){
-      let div = document.createElement('div');
+      let div = document.createElement('form');
       div.className='mes';
       div.style.marginLeft = '0.5rem';
       div.style.marginTop = '0.8rem';
@@ -338,8 +355,9 @@ class MessagesView{
         div3.appendChild(deleteEdit);
         div.appendChild(div3);
       }
-      else
+      else{
         div.style.backgroundColor = '#F7FFE5';
+      }
       console.log(div);
 
       this.list.appendChild(div);
@@ -432,7 +450,7 @@ const userList = new UserList(['Dima', 'Zhenya Zh.', 'Zhenya H.', 'Sasha', 'Pash
 const active = new ActiveUsersView('checkmark1');
 const persUsView = new PersonalUsersView('users');
 const header = new HeaderView('user-name');
-const cotroller = new chatController(model, userList, view, active, persUsView, header);
+const cotroller = new ChatController();
 
 
 function toLogIn(){
@@ -522,6 +540,7 @@ function toLogIn(){
       return;
     }
     setCurrentUser(input2.value);
+    localStorage.setItem('author', input2.value);
     butt4.style.background = 'linear-gradient(0deg, #21922D, #F5F191)';
     div.style.display = 'none';
     let chat = document.getElementById("message-box");
@@ -643,6 +662,7 @@ function toSignUp(){
          return;
       }
       setCurrentUser(input2.value);
+      localStorage.setItem('author', input2.value);
       div.style.display = 'none';
       let chat = document.getElementById("message-box");
       chat.style.display = 'flex';
@@ -672,7 +692,7 @@ function showMessages(begin = 0, count = 10, obj = {}){
 
 
 function addMessage(msg = {}){
-  if(cotroller.addMessage(msg, model, view));
+  cotroller.addMessage(msg, model, view);
   localStorage.setItem(model.arrOfMessages[model.arrOfMessages.length - 1].id, JSON.stringify(model.arrOfMessages[model.arrOfMessages.length - 1]));
 }
 
