@@ -12,8 +12,10 @@
 <body class="body">
 	<header class="header" id = "header">
 		<div class="name-of-chat"><p>FlexChat</p></div>
-		<div class="name-of-user" id="user-name"><p>Name account: Ваня Петров</p></div>
-		<div class="exit"><p><a href="#" onclick = "toLogIn()">Exit</a></p></div>
+		<div class="name-of-user" id="user-name"><p>You are a guest</p></div>
+		<div class="exit" id = 'exit-1'><p><a href="#" onclick = "toLogIn1()">Exit</a></p></div>
+		<div class="exit" id = 'mp-1'><p><a href="#" onclick = 'toMainPage1()'>Main page</a></p></div>
+		<div class="exit" id = 'mp-2'><p><a href="#" onclick = 'toSignUp()'>Sign up</a></p></div>
 	</header> 
 	<main class="main" id ="main">
 		
@@ -67,6 +69,40 @@
 				</div>
 			</div>
 		</div>	
+		<div id = 'login'>
+			<div id = 'log'><p>Log in to your account</p></div>
+			<div id = 'name'>
+				Name
+				<input type = 'input' id = 'in-1'>
+			</div>
+			<div id = 'password'>
+				Password
+				<input type = 'password' id = 'in-2'>
+			</div>
+			<div id = 'butt'>
+				<button onclick="toMainPage()" id = 'butt4'>Ok</button>
+			</div>
+		</div>
+
+		<div id = 'sign-up'>
+			<div id = 'log'><p>Sign up</p></div>
+			<div id = 'name-1'>
+				Name
+				<input type = 'input' id = 'in-10'>
+			</div>
+			<div id = 'password-1'>
+				Password
+				<input type = 'password' id = 'in-11'>
+			</div>
+			<div id = 'repeat-1'>
+				Repeat a password
+				<input type = 'password' id = 'in-21'>
+			</div>
+			<div id = 'butt-1'>
+				<button id = 'butt5' onclick="goToChat()">Ok</button>
+			</div>
+		</div>
+
 	</main>
 	<footer class="footer">
 		<div class="date-of-changes"><p>Date of last changes: 24.10.2020</p></div>

@@ -64,9 +64,12 @@ class ChatController{
   addMessage(obj = {}, model, view){
     let text = document.getElementById('input').value;
     if(text !== ""){
-      console.log(text);
+      
       obj.text = text;
-      obj.isPersonal = false;
+      if(obj.isPersonal === undefined){
+        obj.isPersonal = false;
+      }
+      console.log(obj);
       document.getElementById('input').value = "";
       if(model.add(obj)){
         view.display(model.getPage());
@@ -74,6 +77,19 @@ class ChatController{
       }
     }
     
+  }
+
+  addPrivateMessage(model, view){
+    let cont = document.getElementById('checkmark1');
+    let obj = {};
+    cont.addEventListener('click', ({ target: t }) => {
+    if (t.className === 'onl-users') {
+      console.log(t.textContent);
+      obj.isPersonal = true;
+      obj.to = t.textContent;
+      this.addMessage(obj, model, view);
+    }
+    });
   }
 
   filter(begin = 0, count = 10, model, view, obj = {}){
@@ -96,7 +112,7 @@ class ChatController{
       this.k+=10;
   }
 
-  save(model, view){
+  save(model1, view){ 
         for(let uk = 0; uk < localStorage.length; uk++){
           let key = localStorage.key(uk);
           if(key === 'author'){
@@ -196,42 +212,53 @@ class Model{
     }
     console.log(arr1);
     arr1 = arr1.filter((item) => (item.author === this.user || item.to === this.user || item.isPersonal === false));
-  
+
     return arr1.sort((prev, next) => next.createdAt - prev.createdAt).slice(begin, begin + count);
    }
 
     add(messObj){
-    let max = Number(this.arrOfMessages[0].id);
-    this.arrOfMessages.forEach(function(item){
-      if(max < Number(item.id)){
-        max = Number(item.id);
+      let max = Number(this.arrOfMessages[0].id);
+      this.arrOfMessages.forEach(function(item){
+        if(max < Number(item.id)){
+          max = Number(item.id);
+        }
+      });
+      let id = String(+max + 1);
+      let createdAt;
+      if(messObj.createdAt !== undefined){
+        createdAt = messObj.createdAt;
+        console.log('grtg');
       }
-    });
-    let id = String(+max + 1);
-    let createdAt;
-    if(messObj.createdAt !== undefined){
-      createdAt = messObj.createdAt;
-      console.log('grtg');
-    }
-    else
-      createdAt = new Date();
-    let author;
-    if(messObj.author !== undefined){
-      author = messObj.author;
-    }else{
-      author = this.user;
-    }
-    let text = messObj.text;
-    let isPersonal = messObj.isPersonal;
+      else
+        createdAt = new Date();
+      let author;
+      if(messObj.author !== undefined){
+        author = messObj.author;
+      }else{
+        author = this.user;
+      }
+      let text = messObj.text;
+      let isPersonal;
+      if(messObj.isPersonal !== undefined){
+        isPersonal = messObj.isPersonal;
+      }else{
+        isPersonal = false;
+      }
 
-    messObj = new Message(id, text, author, createdAt, isPersonal);
+      let to;
 
-    if(this.validate(messObj)){
-      this.arrOfMessages.push(messObj);  
-      return true;
-    }
+      if(messObj.to !== undefined){
+        to = messObj.to;
+      }
+      
+      messObj = new Message(id, text, author, createdAt, isPersonal, to);
 
-    return false;
+      if(this.validate(messObj)){
+        this.arrOfMessages.push(messObj);  
+        return true;
+      }
+
+      return false;
   }
 
    remove(id){
@@ -241,6 +268,7 @@ class Model{
         console.log("Вы не автор данного сообщения");
         return false;
       }
+      localStorage.removeItem(id);
       this.arrOfMessages.splice(this.arrOfMessages.findIndex((item, index) => item.id === id), 1);
       return true;  
     }
@@ -275,12 +303,10 @@ class Model{
         secondMess._to = msg.to;
       }
 
-      console.log(secondMess);
-
-  
       for( let key in secondMess){
         mess[key]=secondMess[key];
       }
+
        return true;
     }
 }
@@ -313,6 +339,8 @@ class MessagesView{
   display(msgs, user = null){
     let obj = document.getElementsByClassName('mes');
     let arr = [...obj];
+    console.log('1');
+    console.log(msgs);
     for(let i = 0; i < arr.length; i++)
       this.list.removeChild(arr[i]);//чистим наше окно с сообщениями, чтобы заполнить его новыми
     for(let i = msgs.length - 1; i >= 0; i--){
@@ -324,13 +352,30 @@ class MessagesView{
       div.style.width = '21rem';
       let div1 = document.createElement('div');
       let div2 = document.createElement('div');
+      let div4 = document.createElement('div');
+      let div5 = document.createElement('div');
+     
+      if(msgs[i].isPersonal === false){
+        div4.textContent = 'to all';
+      }
+      else if(msgs[i].isPersonal === true && msgs[i].to !== undefined){
+        div4.textContent = 'to ' + msgs[i].to; 
+      }
+
       let date1 = msgs[i].createdAt;
       div1.innerHTML = msgs[i].text;
       div1.className = 'text';
+      div5.style.opacity = '0.7';
       div2.innerHTML = msgs[i].author + ' '+ date1.getHours() + ':' + date1.getMinutes()+' '+ date1.getDate()+'.'+ (date1.getMonth()+1) + '.' + date1.getFullYear() ;
       div2.style.cssText = `font-size: 12px`;
+      div4.style.cssText = `font-size: 12px`;
+      div4.style.marginLeft = 'auto';
+      div5.appendChild(div2);
+      div5.appendChild(div4);
+      div5.style.display = 'flex';
       div.appendChild(div1);
-      div.appendChild(div2);
+      div.appendChild(div5);
+      
       div.id = msgs[i].id;
       if(msgs[i].author === this.user){
         div.style.backgroundColor = '#DAFFBC';
@@ -376,6 +421,7 @@ class ActiveUsersView{
     for(let i = 0; i < arr.length; i++){
       let div = document.createElement('div');
       div.innerHTML = arr[i];
+      div.className = 'onl-users';
       div.style.cssText = `color: #1345C5;`;
       div.style.height = '2rem';
       div.style.paddingLeft = '0.5rem';
@@ -453,85 +499,28 @@ const header = new HeaderView('user-name');
 const cotroller = new ChatController();
 
 
-function toLogIn(){
-  let chat = document.getElementById("message-box");
-  chat.style.display = 'none';
-  let div = document.createElement('div');
-  let parent = document.getElementById('main');
-  div.style.margin ='0 auto';
-  div.id = 'login'; 
-  div.style.width = '18rem';
-  div.style.height = '16rem';
-  div.style.backgroundColor= 'rgb(221, 243, 255, 0.6)';
-  div.id = 'main-page';
-  let div1 = document.createElement('div');
-  let div2 = document.createElement('div');
-  let input2 = document.createElement('input');
-  div2.innerHTML = 'Login';
-  input2.style.marginLeft = '0.3rem';
-  input2.style.outline = 'none';
-  input2.title = "Enter a login";
-  div2.style.paddingLeft = '3rem';
-  div2.appendChild(input2);
-  div.appendChild(div2);
-  let div3 = document.createElement('div');
-  let input3 = document.createElement('input');
-  div3.innerHTML = 'Password';          
-  div3.style.paddingLeft = '1.58rem';
-  input3.type = "password";
-  input3.title = "Enter a password";
-  input3.style.marginLeft = '0.3rem';
-  input3.style.outline = 'none';
-  div3.appendChild(input3);
-  div3.style.marginTop = '2rem';
-  let div4 = document.createElement('div');
-  let butt4 = document.createElement('button');
-  div4.appendChild(butt4);
-  div4.style.textAlign = 'center';
-  div4.style.marginTop = '2rem';
-  butt4.textContent = 'Enter';
-  div4.style.height = '2rem';
-  butt4.style.height = '100%';
-  butt4.style.width = '6rem';
-  butt4.style.border = '0';
+function toLogIn1(){
+  document.getElementById('message-box').style.display = 'none';
+  let login = document.getElementById('login');
+  login.style.display = 'block';
+  login.style.margin = '0 auto';
+  document.getElementById('exit-1').style.display = 'none';
+  let hr1 = document.getElementById('mp-1');
+  hr1.style.display = 'block';
+  hr1.style.width = '10%';
+  let hr2 = document.getElementById('mp-2');
+  hr2.style.display = 'block';
+  hr2.style.width = '10%';
+  let butt4 = document.getElementById('butt4');
+  butt4.style.background = 'linear-gradient(0deg, #21922D, #F5F191)';
+  document.getElementById('in-1').title = 'Enter your name';
+  document.getElementById('in-2').title = 'Enter a password';
+}
 
-  butt4.style.outline = '0';
-  butt4.style.fontSize = '17px';
-  butt4.style.background = 'linear-gradient(0deg, #F7FFC3, #A0FFB0)';
-  div1.style.width = '100%';
-  div1.style.height = '3rem';
-  div1.textContent = 'Log in to your account';
-  div1.style.textAlign = 'center';
-  div1.style.paddingTop = '2.5rem';
-  div1.style.fontSize = '24px';
-  div1.style.fontFamily = 'Arial';
-  div.appendChild(div1);
-  div.appendChild(div2);
-  div.appendChild(div3);
-  div.appendChild(div4);
-  console.log(parent);
-  parent.appendChild(div);
-  let div5 = document.createElement('div');
-  div5.id = 'sign-up';
-  let header = document.getElementById('header');
-  let href = document.createElement('a');
-  let div6 = document.getElementsByClassName('exit');
-  div6[0].style.width = '10%';
-  href.style.fontFamily = 'Arial';
-  div5.style.paddingTop = '0.7rem';
-  div5.style.textAlign = 'center';
-  div5.style.fontSize = '24px';
-  href.href = '#';
-  href.id = 'href-1';
-  href.textContent = 'Sign up';
-  div5.appendChild(href);
-  div5.style.width = '10%';
-  div5.style.height = '100%';
-  header.appendChild(div5);
-  let a = document.querySelector('.exit > p > a');
-  a.textContent = 'Main page';
-  butt4.addEventListener('click', () => {
-    if(input2.value === ''){
+function toMainPage(){
+  let input2 = document.getElementById('in-1');
+  let input3 = document.getElementById('in-2');
+  if(input2.value === ''){
       input2.style.background = '#FFDFDF';
       return;
     }
@@ -541,109 +530,55 @@ function toLogIn(){
     }
     setCurrentUser(input2.value);
     localStorage.setItem('author', input2.value);
-    butt4.style.background = 'linear-gradient(0deg, #21922D, #F5F191)';
-    div.style.display = 'none';
-    let chat = document.getElementById("message-box");
-    chat.style.display = 'flex';
-    document.getElementById('sign-up').remove();
-    a.textContent = 'Exit';
-  });  
-  a.addEventListener('click', () => {
-    if(a.textContent === 'Main page'){
-      let main = document.getElementById('main-page');
-      main.remove();
-      let main1 = document.getElementById('main-page');
-      main1.style.display = 'none';
-      div5.remove();
-      let main2 = document.getElementById('sign-up');
-      main2.remove();
-      let chat = document.getElementById("message-box");
-      chat.style.display = 'flex';
-      a.textContent = 'Exit';
-      let main3 = document.getElementById('main-page-1');
-      main3.remove();
-      let main4 = document.getElementById('main-page-1');
-      main4.remove();
-      //console.log(a);
-      let main5 = document.getElementById('main-page-1');
-      main5.style.display = 'none';
-  }else toLogIn();
-});
-  href.addEventListener('click', toSignUp);
+
+    document.getElementById('message-box').style.display = 'flex';
+    let login = document.getElementById('login');
+    login.style.display = 'none';
+    document.getElementById('exit-1').style.display = 'block';
+    let hr1 = document.getElementById('mp-1');
+    hr1.style.display = 'none';
+    let hr2 = document.getElementById('mp-2');
+    hr2.style.display = 'none';
+    input2.value = '';
+    input3.value = '';
+    
+}
+
+//localStorage.clear();
+function toMainPage1(){
+    document.getElementById('message-box').style.display = 'flex';
+    let login = document.getElementById('login');
+    login.style.display = 'none';
+    let sign = document.getElementById('sign-up');
+    sign.style.display = 'none';
+    document.getElementById('exit-1').style.display = 'block';
+    let hr1 = document.getElementById('mp-1');
+    hr1.style.display = 'none';
+    let hr2 = document.getElementById('mp-2');
+    hr2.style.display = 'none';    
 }
 
 function toSignUp(){
-    let chat = document.getElementById("main-page");
-    chat.style.display = 'none';
-    let div = document.createElement('div');
-    let parent = document.getElementById('main');
-    div.style.margin ='0 auto';
-    div.id = 'sign-up-1'; 
-    div.style.width = '22rem';
-    div.style.height = '18rem';
-    div.style.backgroundColor= 'rgb(221, 243, 255, 0.6)';
-    div.id = 'main-page-1';
-    let div1 = document.createElement('div');
-    let div2 = document.createElement('div');
-    let input2 = document.createElement('input');
-    div2.innerHTML = 'Login';
-    let div10 = document.createElement('div');
-    div10.style.paddingLeft = '1.8rem'; 
-    let input10 = document.createElement('input');
-    input10.style.marginLeft = '0.3rem';
-    input10.title = "Repeat your password";
-    div10.style.marginTop = '1.5rem';
-    div10.innerHTML = 'Repeat a password';
-    div10.appendChild(input10);
-    input2.style.marginLeft = '0.3rem';
-    input2.style.outline = 'none';
-    input2.title = "Enter a login";
-    div2.style.paddingLeft = '7rem';
-    div2.appendChild(input2);
-    div.appendChild(div2);
-    let div3 = document.createElement('div');
-    let input3 = document.createElement('input');
-    div3.innerHTML = 'Password';          
-    div3.style.paddingLeft = '5.5rem';
-    input3.type = "password";
-    input3.title = "Enter a password";
-    input3.style.marginLeft = '0.3rem';
-    input3.style.outline = 'none';
-    div3.appendChild(input3);
-    div3.style.marginTop = '1.5rem';
-    let div4 = document.createElement('div');
-    let butt4 = document.createElement('button');
-    div4.appendChild(butt4);
-    div4.style.textAlign = 'center';
-    div4.style.marginTop = '2rem';
-    butt4.textContent = 'Ok';
-    div4.style.height = '2rem';
-    butt4.style.height = '100%';
-    butt4.style.width = '6rem';
-    butt4.style.border = '0';
-    input10.type = 'password';
+  let sign = document.getElementById('sign-up');
+  document.getElementById('login').style.display = 'none';
+  sign.style.display = 'block';
+  sign.style.margin = '0 auto';
+  document.getElementById('in-10').title = 'Enter your name';
+  document.getElementById('in-11').title = 'Enter a password';
+  document.getElementById('in-21').title = 'Repeat your a password';
+  let hr1 = document.getElementById('mp-1');
+  hr1.style.width = '20%';
+  let hr2 = document.getElementById('mp-2');
+  hr2.style.display = 'none';
+  let butt4 = document.getElementById('butt5');
+  butt4.style.background = 'linear-gradient(0deg, #21922D, #F5F191)';
+}
 
-    butt4.style.outline = '0';
-    butt4.style.fontSize = '17px';
-    butt4.style.background = 'linear-gradient(0deg, #F7FFC3, #A0FFB0)';
-    div1.style.width = '100%';
-    div1.style.height = '3rem';
-    div1.textContent = 'Sign up';
-    div1.style.textAlign = 'center';
-    div1.style.paddingTop = '2.5rem';
-    div1.style.fontSize = '24px';
-    div1.style.fontFamily = 'Arial';
-    div.appendChild(div1);
-    div.appendChild(div2);
-    div.appendChild(div3);
-    div.appendChild(div10);
-    div.appendChild(div4);
-    console.log(parent);
-    parent.appendChild(div);
-    let a = document.querySelector('.exit > p > a');
-    
-    butt4.addEventListener('click', () => {
-      if(input2.value === ''){
+function goToChat(){
+  let input2 = document.getElementById('in-10');
+  let input3 = document.getElementById('in-11');
+  let input10 = document.getElementById('in-21');
+  if(input2.value === ''){
         input2.style.background = '#FFDFDF';
         return;
       }
@@ -661,17 +596,11 @@ function toSignUp(){
          input10.style.background = '#FFDFDF';
          return;
       }
-      setCurrentUser(input2.value);
-      localStorage.setItem('author', input2.value);
-      div.style.display = 'none';
-      let chat = document.getElementById("message-box");
-      chat.style.display = 'flex';
-      setCurrentUser(input2.value);
-      a.textContent = 'Exit';
-    });
-
-    document.getElementById('sign-up').remove();
-
+  setCurrentUser(input2.value);
+  localStorage.setItem('author', input2.value);
+  let sign = document.getElementById('sign-up');
+  sign.style.display = 'none';
+  document.getElementById('message-box').style.display = 'flex';
 }
 
 function showActiveUsers(){
@@ -709,13 +638,16 @@ function downloadMoreMessages(){
 }
 
 
-//localStorage.clear();
-setCurrentUser('Tom');
-//showMessages(0, 10);
 showActiveUsers();
-//addMessage({text: 'Пока', isPersonal: false});
 removeMessage();
 editMessage();
+
+document.getElementById('login').style.display = 'none';
+document.getElementById('mp-1').style.display = 'none';
+document.getElementById('mp-2').style.display = 'none';
+document.getElementById('sign-up').style.display = 'none';
+
+cotroller.addPrivateMessage(model, view);
 cotroller.save(model, view);
 
 //localStorage.clear();

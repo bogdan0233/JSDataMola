@@ -614,7 +614,77 @@ a{
 	margin-left: auto;
 }
 
+#login{
+	background: rgb(221, 243, 255, 0.6);
+	width: 18rem;
+	height: 16rem;
+}
 
+#sign-up{
+	background: rgb(178, 225, 252, 0.6);
+	width: 22rem;
+	height: 18rem;
+}
+
+#log{
+	text-align: center;
+	height: 25%;
+}
+
+#log p{
+	color: white;
+	font-size: 25px;
+
+}
+
+#name{
+	height: 20%;
+	padding-left: 2.9rem;
+}
+
+#password{
+	height: 15%;
+	padding-left: 1.5rem;
+}
+
+#butt{
+	height: 20%;
+	text-align: center;
+}
+
+#name-1{
+	height: 15%;
+	padding-left: 6.1rem;
+}
+
+#password-1{
+	height: 15%;
+	padding-left: 4.7rem;
+}
+
+#repeat-1{
+	height: 15%;
+	padding-left: 1.1rem;
+}
+
+#butt-1{
+	height: 20%;
+	text-align: center;
+}
+
+#butt4{
+	height: 2rem;
+	width: 4rem;
+	border: 0;
+	outline: 0;
+}
+
+#butt5{
+	height: 2rem;
+	width: 4rem;
+	border: 0;
+	outline: 0;
+}
 
 .active-users:hover .active-users-1{
 	display: block;
