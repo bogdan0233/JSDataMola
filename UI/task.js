@@ -49,6 +49,13 @@ class Message{
 
 }
 
+class chatApiService{
+  constructor(url){
+    //let response = await fetch(url);
+    //console.log(response);
+  }
+}
+
 class ChatController{
   constructor(){
     this.model = new Model(messages);
@@ -58,8 +65,6 @@ class ChatController{
     this.persUsView = new PersonalUsersView('users');
     this.header = new HeaderView('user-name');
   }
-
-  k = 10;
 
   addMessage(obj = {}, model, view){
     let text = document.getElementById('input').value;
@@ -107,9 +112,11 @@ class ChatController{
 
   }
 
+  k = 10;
   downloadMoreMessages(view, model){
       view.display(model.getPage(0, this.k + 10, {})); 
       this.k+=10;
+      console.log(this.k);
   }
 
   save(model1, view){ 
@@ -219,7 +226,7 @@ class Model{
 
     console.log('arr1');
     console.log(arr1);
-    return arr1.sort((prev, next) => next.createdAt - prev.createdAt).slice(begin, begin + count);
+    return arr1.sort((prev, next) => next._createdAt - prev._createdAt).slice(begin, begin + count);
    }
 
     add(messObj){
@@ -336,7 +343,13 @@ class HeaderView{
 
   display(user){
       this.containerId.style.cssText = `color: #324CA8; font-size: 24px; margin-top: 0.7rem;`;
-      this.containerId.textContent = 'Name account: ' + user;
+      if(user !== null){
+        this.containerId.textContent = 'Name account: ' + user;
+      }else{
+        this.containerId.textContent = 'You are a guest';
+        document.querySelector('#exit-1>p>a').textContent = 'Log in';
+      }
+      
   }
 }
 
@@ -551,6 +564,7 @@ function toMainPage(){
     hr2.style.display = 'none';
     input2.value = '';
     input3.value = '';
+    document.querySelector('#exit-1>p>a').textContent = 'Exit';
     
 }
 
@@ -565,6 +579,7 @@ function toMainPage1(){
     hr1.style.display = 'none';
     let hr2 = document.getElementById('mp-2');
     hr2.style.display = 'none';    
+    //document.querySelector('#exit-1>p>a').textContent = 'Exit';
 }
 
 function toSignUp(){
@@ -587,7 +602,7 @@ function goToChat(){
   let input2 = document.getElementById('in-10');
   let input3 = document.getElementById('in-11');
   let input10 = document.getElementById('in-21');
-  if(input2.value === ''){
+      if(input2.value === ''){
         input2.style.background = '#FFDFDF';
         return;
       }
@@ -610,11 +625,23 @@ function goToChat(){
   let sign = document.getElementById('sign-up');
   sign.style.display = 'none';
   document.getElementById('message-box').style.display = 'flex';
+  document.getElementById('mp-1').style.display = 'none';
+  document.getElementById('exit-1').style.display = 'block';
+  document.querySelector('#exit-1>p>a').textContent = 'Exit';
+  input3.value = '';
+  input2.value = '';
+  input10.value = '';
+  input10.style.background = 'white';
+  input3.style.background = 'white';
+  input2.style.background = 'white';
+
 }
 
 function showActiveUsers(){
   active.display(userList.activeUsers);
   persUsView.display(userList.users);
+  localStorage.setItem('activeUsers', JSON.stringify(userList.activeUsers));
+  localStorage.setItem('users', JSON.stringify(userList.users));
 }
 
 function setCurrentUser(user){
@@ -646,6 +673,7 @@ function downloadMoreMessages(){
 }
 
 
+
 showActiveUsers();
 removeMessage();
 editMessage();
@@ -658,4 +686,7 @@ document.getElementById('sign-up').style.display = 'none';
 cotroller.addPrivateMessage(model, view);
 cotroller.save(model, view);
 
+
+
+//let res = new chatApiService('https://jslabdb.datamola.com/messages?skip=0&top=10');
 //localStorage.clear();
