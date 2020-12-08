@@ -64,7 +64,7 @@
           			</div>
           		</div>	
 				<div class="send" id = "send-box">
-					<input type="input" name="send-box" value="" class="send-box" placeholder="Write a message" id="input">
+					<textarea type="input" name="send-box" value="" class="send-box" placeholder="Write a message" id="input"></textarea>
 					<button type="button" class="button-2" id = "send" onclick="addMessage()"><p>Send</p></button>
 				</div>
 			</div>
@@ -103,6 +103,14 @@
 			</div>
 		</div>
 
+		<div id = 'form-of-error'>
+      <div id = 'error'>Error</div>
+      <div id = 'text-of-error'>Unfortunately, an error occurred on the server.
+		But our programmers are already working with 
+		this problem</div>
+      <div id = 'photo-of-error'><img src = 'sadcat.jpg'></div>
+    </div>
+		
 	</main>
 	<footer class="footer">
 		<div class="date-of-changes"><p>Date of last changes: 24.10.2020</p></div>

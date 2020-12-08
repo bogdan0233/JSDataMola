@@ -49,16 +49,273 @@ class Message{
 
 }
 
-class chatApiService{
+let top1 = 10;
+let user;
+let array;
+
+class ChatApiService{
   constructor(url){
-    //let response = await fetch(url);
-    //console.log(response);
+    this.url = url;
+  }
+
+  token;
+  user;
+
+  getMessages(skip = 0, top = 10) {
+
+    let array; 
+
+
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer some.token");
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    fetch(`${this.url}/messages?skip=${skip}&top=${top}`, requestOptions)
+      .then(response => response.text())
+      .then(result => {
+       result = JSON.parse(result);
+       const model = new Model(result);
+       const view = new MessagesView('chat-box-1');
+       for(let i = 0; i < model.arrOfMessages.length; i++){
+         model.arrOfMessages[i].createdAt = new Date(model.arrOfMessages[i].createdAt);
+       }
+       localStorage.setItem('array', JSON.stringify(model.arrOfMessages));
+       array = model.arrOfMessages;
+       console.log(model.arrOfMessages);
+       view.display(model.arrOfMessages);
+      })
+      .catch(error => {
+        console.log('error', error);
+        errorWindow();
+      });
+      
+  }
+
+
+  login(name, pass) {
+    console.log(name);
+    console.log(pass);
+    var formdata = new FormData();
+    formdata.append("name", name);
+    formdata.append("pass", pass);
+
+    var requestOptions = {
+      method: 'POST',
+      body:formdata,
+      redirect: 'follow'
+    };
+
+    fetch(`${this.url}/auth/login`, requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        localStorage.setItem('token', JSON.stringify(result));
+        if(result.error !== undefined){
+          this.user = undefined;
+          localStorage.removeItem('user');
+        }else{
+          this.user = formdata.get('name');
+          localStorage.setItem('user', this.user);
+        }
+       
+      })
+      .catch(error => console.log('error', error));
+
+  }
+
+  register(name, pass) {
+    var formdata = new FormData();
+    formdata.append("name", name);
+    formdata.append("pass", pass);
+
+    var requestOptions = {
+      method: 'POST',
+      body:formdata,
+      redirect: 'follow'
+    };
+
+    fetch(`${this.url}/auth/register`, requestOptions)
+    setTimeout( () =>{
+      fetch(`${this.url}/auth/login`, requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        localStorage.setItem('token', JSON.stringify(result));
+        if(result.error !== undefined){
+          this.user = undefined;
+          localStorage.removeItem('user');
+        }else{
+          this.user = formdata.get('name');
+          localStorage.setItem('user', this.user);
+          console.log(this.user);
+        }
+       
+        console.log(result);
+      })
+      .catch(error => console.log('error', error));
+
+    }, 1000);
+
+  }
+
+  logout(){
+    this.token = JSON.parse(localStorage.getItem('token'));
+   
+    if(this.token !== null){
+      this.token = this.token.token;
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${this.token}`);
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    console.log(this.user);
+    console.log(this.token);
+
+
+    fetch(`${this.url}/auth/logout`, requestOptions)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => console.log('error', error));
+    } 
+    
+  }
+
+  getUsers(){
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer some.token");
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    fetch(`${this.url}/users`, requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        result = JSON.parse(result);
+        const userList = new UserList([], []);
+        const active = new ActiveUsersView('checkmark1');
+        const persUsView = new PersonalUsersView('users');
+        
+        for(let i = 0; i < result.length; i++){
+          if(result[i].isActive === true){
+            userList.activeUsers.push(result[i].name);
+          }else{
+            userList.users.push(result[i].name);
+          }
+        }
+        active.display(userList.activeUsers);
+        persUsView.display(userList.users);
+        console.log(userList);
+        })
+        .catch(error => {
+        console.log('error', error);
+        errorWindow();
+      });
+  }
+
+  postMessage( mess ){
+
+    this.token = localStorage.getItem('token');
+    this.token = JSON.parse(this.token);
+    this.token = this.token.token;
+    console.log(`Bearer ${this.token}`);
+
+    this.user = localStorage.getItem('author');
+
+    let postMessageHeaders = new Headers();
+    postMessageHeaders.append('Authorization', `Bearer ${this.token}`);
+    postMessageHeaders.append('Content-Type', 'application/json');
+    console.log(mess);
+    let raw;
+    if( mess.to === undefined){
+      raw = `{\n    \"text\": \"${mess.text}\",\n    \"isPersonal\": false}`;
+    }
+    else{
+      raw = `{\n    \"text\": \"${mess.text}\",\n    \"isPersonal\": true,\n    \"to\": \"${mess.to}\"}`;
+    }
+
+    var requestOptions = {
+      method: 'POST',
+      headers: postMessageHeaders,
+      body: raw,
+      redirect: 'follow',
+    };
+
+    fetch(`${this.url}/messages`, requestOptions)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('error', error));
+  }
+
+  editMessage(id){
+    this.token = localStorage.getItem('token');
+    this.token = JSON.parse(this.token);
+    this.token = this.token.token;
+    console.log(`Bearer ${this.token}`);
+
+
+    let editMessageHeaders = new Headers();
+    editMessageHeaders.append('Authorization', `Bearer ${this.token}`);
+    editMessageHeaders.append('Content-Type', 'application/json');
+
+    var raw1 = {
+      text: "his",
+      isPersonal: false,
+    }
+
+    let mess = document.getElementById('input').value;
+    var raw = `{\n  \"text\": \"${mess}\",\n    \"isPersonal\": false\n  }`;
+
+    var requestOptions = {
+      method: 'PUT',
+      headers: editMessageHeaders,
+      body: raw,
+      redirect: 'follow',
+    };
+
+    fetch(`${this.url}/messages/${id}`, requestOptions)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('error', error));
+  }
+
+  deleteMessage(id){
+    this.token = localStorage.getItem('token');
+    this.token = JSON.parse(this.token);
+    this.token = this.token.token;
+    console.log(`Bearer ${this.token}`);
+
+
+    let editMessageHeaders = new Headers();
+    editMessageHeaders.append('Authorization', `Bearer ${this.token}`);
+    editMessageHeaders.append('Content-Type', 'application/json');
+
+    var requestOptions = {
+      method: 'DELETE',
+      headers: editMessageHeaders,
+      redirect: 'follow',
+    };
+
+    fetch(`${this.url}/messages/${id}`, requestOptions)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('error', error));
   }
 }
 
 class ChatController{
   constructor(){
-    this.model = new Model(messages);
+    this.model = new Model([]);
     this.view = new MessagesView('chat-box-1');
     this.userList = new UserList(['Dima', 'Zhenya Zh.', 'Zhenya H.', 'Sasha', 'Pasha', 'Masha', 'Kasha'], ['Dima', 'Zhenya', 'Vlad', 'Nastya', 'Kolya']);
     this.active = new ActiveUsersView('checkmark1');
@@ -66,33 +323,37 @@ class ChatController{
     this.header = new HeaderView('user-name');
   }
 
-  addMessage(obj = {}, model, view){
-    let text = document.getElementById('input').value;
-    if(text !== ""){
-      
-      obj.text = text;
-      if(obj.isPersonal === undefined){
-        obj.isPersonal = false;
+  addMessage(obj = {}, cAS, view){
+    cAS.user = localStorage.getItem('author');
+    for(let i = 0; i < 1; i++){
+      console.log(cAS.user);
+      if(cAS.user === undefined){
+        break;
       }
-      console.log(obj);
-      document.getElementById('input').value = "";
-      if(model.add(obj)){
-        view.display(model.getPage());
-        return true;
-      }
-    }
-    
-  }
+      let text = document.getElementById('input').value;
+      if(text !== ""){
+        
+        obj.text = text;
+        if(obj.isPersonal === undefined){
+          obj.isPersonal = false;
+        }
+        console.log(obj);
+        document.getElementById('input').value = "";
+        cAS.postMessage(obj);
+        cAS.getMessages();
+          return true;
+        }
+    }   
+  }  
 
-  addPrivateMessage(model, view){
+  addPrivateMessage(cAS, view){
     let cont = document.getElementById('checkmark1');
     let obj = {};
     cont.addEventListener('click', ({ target: t }) => {
-    if (t.className === 'onl-users') {
-      console.log(t.textContent);
+    if (t.className === 'onl-users' || t.className === 'onl-users-1') {
       obj.isPersonal = true;
       obj.to = t.textContent;
-      this.addMessage(obj, model, view);
+      this.addMessage(obj, cAS, view);
     }
     });
   }
@@ -108,11 +369,30 @@ class ChatController{
     obj.author = document.getElementById('inp-4').value;
     obj.text = document.getElementById('inp-3').value;
     console.log(obj);
-    view.display(model.getPage(begin, count, obj));
+    var myHeaders = new Headers();
 
+    myHeaders.append("Authorization", "Bearer some.token");
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    fetch(`https://jslabdb.datamola.com/messages?skip=0&top=10000`, requestOptions)
+      .then(response => response.text())
+      .then(result => {
+       result = JSON.parse(result);
+       const model = new Model(result);
+       const view = new MessagesView('chat-box-1');
+       for(let i = 0; i < model.arrOfMessages.length; i++){
+         model.arrOfMessages[i].createdAt = new Date(model.arrOfMessages[i].createdAt);
+       }
+       view.display(model.getPage(0, 1000, obj));        
+      })
   }
 
-  k = 10;
+  
   downloadMoreMessages(view, model){
       view.display(model.getPage(0, this.k + 10, {})); 
       this.k+=10;
@@ -131,58 +411,78 @@ class ChatController{
         messages[i]._createdAt = new Date(messages[i]._createdAt);
       }
       
-
       for(let i = 0; i < messages.length; i++){
         model1.arrOfMessages[i] = new Message(messages[i]._id, messages[i]._text, messages[i]._author, messages[i]._createdAt, messages[i]._isPersonal, messages[i]._to);
       }
     }
 
-
     let auth = localStorage.getItem('author');
-    setCurrentUser(auth);
+    console.log(auth);
+    if(auth !== 0 && auth !== null){
+      setCurrentUser(auth);
+    }
+    
   }
 
-  edit(model){
+  edit(cAS){
     let cont = document.getElementById('chat-box-1');
+    let arr;
     cont.addEventListener('click', ({ target: t }) => {
-    if (t.tagName === 'BUTTON' && t.textContent ==='Edit') {
-      let div = t.parentElement.parentElement;
-      document.getElementById('input').value = div.childNodes[0].textContent;
-      let div1 = document.getElementById("send");
-      div1.style.display = 'none';
-      let div2 = document.getElementById("send-box");
-      let butt = document.createElement("button");
-      butt.style.border = '0';
-      butt.style.outline = '0';
-      butt.style.fontSize = '17px';
-      butt.style.background = 'linear-gradient(0deg, #F7FFC3, #A0FFB0)';
-      butt.textContent = 'Ok';
-      butt.style.width = '16%';
-      div2.appendChild(butt);
-      butt.addEventListener('click', () => {
-        div.childNodes[0].textContent = document.getElementById('input').value;
-        butt.style.display = 'none';
-        div1.style.display = 'block';
-        document.getElementById('input').value = "";
-        let t = model.edit(div.id, {text: div.childNodes[0].textContent, isPersonal: false});
-        console.log(model.arrOfMessages);
-        console.log(t);
-        console.log(div.childNodes[0].textContent);
-      });
-    }
+      console.log()
+      if (t.tagName === 'BUTTON' && t.textContent ==='Edit') {
+        res.getMessages(0, 1000);
+        setTimeout(() => {
+          let mess = t.parentNode.parentNode;
+          let id = mess.id;
+          arr = localStorage.getItem('array');
+          arr = JSON.parse(arr);
+          let user = arr.find(item => item.id === id);
+          document.getElementById('input').value = user.text;
+          let div1 = document.getElementById("send");
+          div1.style.display = 'none';
+          let userInd = arr.findIndex(item => item.id === id);
+          let butt = document.createElement("button");
+          butt.style.border = '0';
+          butt.style.outline = '0';
+          butt.style.fontSize = '17px';
+          butt.style.background = 'linear-gradient(0deg, #F7FFC3, #A0FFB0)';
+          butt.textContent = 'Ok';
+          butt.style.width = '16%';
+          document.getElementById("send-box").appendChild(butt);
+          butt.addEventListener('click', () => {
+            cAS.editMessage(id);
+            butt.style.display = 'none';
+            div1.style.display = 'block';
+            document.getElementById('input').value = "";      
+        });
+      }, 300);
+
+      setTimeout( () => res.getMessages(0, top1) , 500);
+      }
     });
   }
 
-  removeMessage( model, view ){
+  removeMessage( res ){
     let cont = document.getElementById('chat-box-1');
+    let arr;
     cont.addEventListener('click', ({ target: t }) => {
-    if (t.tagName === 'BUTTON' && t.textContent ==='Delete') {
-        let div = t.parentElement.parentElement;
-        model.remove(div.id);
-        div.remove();
-        view.display(model.getPage()); 
+      console.log()
+      if (t.tagName === 'BUTTON' && t.textContent ==='Delete') {
+        res.getMessages(0, 1000);
+        setTimeout(() => {
+          let mess = t.parentNode.parentNode;
+          let id = mess.id;
+          arr = localStorage.getItem('array');
+          arr = JSON.parse(arr);
+          let user = arr.find(item => item.id === id);
+          let userInd = arr.findIndex(item => item.id === id);
+          console.log(id);
+          res.deleteMessage(id);
+        }, 300);
       }
-      }); 
+      setTimeout( () => res.getMessages(0, top1) , 700);
+      
+    });
   }
 
 
@@ -342,14 +642,14 @@ class HeaderView{
   }
 
   display(user){
+      console.log(user);
       this.containerId.style.cssText = `color: #324CA8; font-size: 24px; margin-top: 0.7rem;`;
-      if(user !== null){
+        if(user !== 0){
         this.containerId.textContent = 'Name account: ' + user;
       }else{
         this.containerId.textContent = 'You are a guest';
         document.querySelector('#exit-1>p>a').textContent = 'Log in';
-      }
-      
+      }      
   }
 }
 
@@ -363,6 +663,8 @@ class MessagesView{
   display(msgs, user = null){
     let obj = document.getElementsByClassName('mes');
     let arr = [...obj];
+    console.log(msgs);
+    this.user = localStorage.getItem('author');
 
     for(let i = 0; i < arr.length; i++)
       this.list.removeChild(arr[i]);//чистим наше окно с сообщениями, чтобы заполнить его новыми
@@ -378,18 +680,18 @@ class MessagesView{
       let div4 = document.createElement('div');
       let div5 = document.createElement('div');
      
-      if(msgs[i]._isPersonal === false){
+      if(msgs[i].isPersonal === false){
         div4.textContent = 'to all';
       }
-      else if(msgs[i]._isPersonal === true && msgs[i]._to !== undefined){
+      else if(msgs[i].isPersonal === true && msgs[i].to !== undefined){
         div4.textContent = 'to ' + msgs[i].to; 
       }
 
-      let date1 = msgs[i]._createdAt;
-      div1.innerHTML = msgs[i]._text;
+      let date1 = msgs[i].createdAt;
+      div1.innerHTML = msgs[i].text;
       div1.className = 'text';
       div5.style.opacity = '0.7';
-      div2.innerHTML = msgs[i]._author + ' '+ date1.getHours() + ':' + date1.getMinutes()+' '+ date1.getDate()+'.'+ (date1.getMonth()+1) + '.' + date1.getFullYear() ;
+      div2.innerHTML = msgs[i].author + ' '+ date1.getHours() + ':' + date1.getMinutes()+' '+ date1.getDate()+'.'+ (date1.getMonth()+1) + '.' + date1.getFullYear() ;
       div2.style.cssText = `font-size: 12px`;
       div4.style.cssText = `font-size: 12px`;
       div4.style.marginLeft = 'auto';
@@ -399,8 +701,8 @@ class MessagesView{
       div.appendChild(div1);
       div.appendChild(div5);
       
-      div.id = msgs[i]._id;
-      if(msgs[i]._author === this.user){
+      div.id = msgs[i].id;
+      if(msgs[i].author === this.user){
         div.style.backgroundColor = '#DAFFBC';
         let div3 = document.createElement('div');
         let buttEdit = document.createElement('button');
@@ -438,22 +740,23 @@ class ActiveUsersView{
   }
 
   display(arr){
-    this.containerId.style.overflow = 'hidden';
     this.containerId.style.overflowY = 'scroll';
     for(let i = 0; i < arr.length; i++){
       let div = document.createElement('div');
-      div.innerHTML = arr[i];
+      let div1 = document.createElement('div');
+      div1.style.width = '100%';
+      div1.style.height = '1.5rem';
+      div1.style.overflow = 'hidden';
+      div1.innerHTML = arr[i];
+      div.id = arr[i];
+      div1.id = arr[i]+'1';
+      div1.className = 'onl-users-1';
       div.className = 'onl-users';
+      div.style.display = 'flex';
       div.style.cssText = `color: #1345C5;`;
       div.style.height = '2rem';
       div.style.paddingLeft = '0.5rem';
-      let pic = document.createElement("IMG");
-      pic.src = "write-message.jpg";
-      pic.style.height = '1rem';
-      pic.style.float = 'right';
-      pic.style.marginTop = '0.2rem';
-      pic.style.marginRight = '0.7rem';
-      div.appendChild(pic);
+      div.appendChild(div1);
       this.containerId.appendChild(div);
     }
     
@@ -466,10 +769,15 @@ class PersonalUsersView{
   }
 
   display(arr){
+
     this.containerId.style.overflow = 'auto';
     for(let i = 0; i < arr.length; i++){
       let div = document.createElement('div');
-      div.innerHTML = arr[i];
+      if(arr[i].length > 18){
+        div.innerHTML = arr[i].slice(0, 18);
+      }else{
+        div.innerHTML = arr[i];
+      }
       div.style.cssText = `color: white; font-size: 20px; `;
       let pic = document.createElement("IMG");
       pic.src = "user4.jpg";
@@ -482,46 +790,25 @@ class PersonalUsersView{
       pic.style.float = 'left';
       div.style.paddingTop = '0.3rem';
       div.style.borderBottom = '2px solid rgb(255, 254, 229, 0.5)';
+      div.style.overflow = 'hidden';
       div.appendChild(pic);
       this.containerId.appendChild(div);
     }
   }
 }
 
-const messages = [
-  new Message('1', 'Всем привет!', 'Mark', new Date('2015-06-12T14:12:00'), false),
-  new Message('2', 'Здарова', 'Bogdan', new Date('2015-06-12T14:12:00'), false),
-  new Message('3', 'как дела?', 'Tom', new Date('2019-11-12T13:18:00'), true, 'Bogdan'),
-  new Message('4', 'Отлично! Сам как?', 'Mark', new Date('2015-06-12T14:12:00'), true),
-  new Message('5', 'Нормально', 'Mark', new Date('2015-06-12T14:12:00'), true),
-  new Message('6', 'Тоже неплохо', 'Bogdan', new Date('2018-06-12T14:12:00'), true),
-  new Message('7', 'Ничем особенным', 'Bogdan', new Date('2015-06-12T14:12:00'), false),
-  new Message('8', 'Понятненько', 'Bogdan', new Date('2018-10-12T11:00:00'), false),
-  new Message('9', 'Бывает','Tom', new Date('2001-10-12T11:00:00'), true),
-  new Message('10', 'Не хочешь сегодня встретиться?', 'Mark', new Date('2015-06-12T14:12:00'), false),
-  new Message('11', 'И погулять)', 'Bogdan', new Date('2015-06-12T14:12:00'), false),
-  new Message('12', 'В 2?', 'Tom', new Date('2015-06-12T14:12:00'), true),
-  new Message('13', 'Давай', 'Mark', new Date('2015-06-12T14:12:00'), true, 'Bogdan'),
-  new Message('14', 'Хорошо', 'Mark', new Date('2010-10-12T11:00:00'), false),
-  new Message('15', 'Только погулять недолго получится', 'Bogdan', new Date('2014-10-12T11:00:00'), true),
-  new Message('16', 'Мне еще надо с Колей встретиться', 'Tom', new Date('2006-10-12T11:00:00'), false),
-  new Message('17', 'До скольки?', 'Tom', new Date('2017-10-12T11:00:00'), false),
-  new Message('18', 'До пяти', 'Bogdan', new Date('2008-10-12T11:00:00'), true),
-  new Message('19', 'А, ну так отлично', 'Mark', new Date('2015-10-12T11:00:00'), false),
-  new Message('20', 'До встречи тогда', 'Tom', new Date('2005-10-12T11:00:00'), true)
-
-] 
-
-const model = new Model(messages);
+const model = new Model([]);
 const view = new MessagesView('chat-box-1');
-const userList = new UserList(['Dima', 'Zhenya Zh.', 'Zhenya H.', 'Sasha', 'Pasha', 'Masha', 'Kasha'], ['Dima', 'Zhenya', 'Vlad', 'Nastya', 'Kolya']);
 const active = new ActiveUsersView('checkmark1');
 const persUsView = new PersonalUsersView('users');
 const header = new HeaderView('user-name');
 const cotroller = new ChatController();
-
+let res = new ChatApiService('https://jslabdb.datamola.com');
 
 function toLogIn1(){
+  console.log(res.token);
+  res.logout();
+  localStorage.clear();
   document.getElementById('message-box').style.display = 'none';
   let login = document.getElementById('login');
   login.style.display = 'block';
@@ -537,7 +824,12 @@ function toLogIn1(){
   butt4.style.background = 'linear-gradient(0deg, #21922D, #F5F191)';
   document.getElementById('in-1').title = 'Enter your name';
   document.getElementById('in-2').title = 'Enter a password';
-  setCurrentUser(null);
+  setCurrentUser(0);
+  let input2 = document.getElementById('in-1');
+  let input3 = document.getElementById('in-2');
+  input2.value = '';
+  input3.value = '';
+  document.getElementById('form-of-error').style.display = 'none';
 }
 
 function toMainPage(){
@@ -551,20 +843,52 @@ function toMainPage(){
       input3.style.background = '#FFDFDF';
       return;
     }
-    setCurrentUser(input2.value);
-    localStorage.setItem('author', input2.value);
+      var formdata = new FormData();
+      formdata.append("name", input2.value);
+      formdata.append("pass", input3.value);
 
-    document.getElementById('message-box').style.display = 'flex';
-    let login = document.getElementById('login');
-    login.style.display = 'none';
-    document.getElementById('exit-1').style.display = 'block';
-    let hr1 = document.getElementById('mp-1');
-    hr1.style.display = 'none';
-    let hr2 = document.getElementById('mp-2');
-    hr2.style.display = 'none';
-    input2.value = '';
-    input3.value = '';
-    document.querySelector('#exit-1>p>a').textContent = 'Exit';
+      var requestOptions = {
+        method: 'POST',
+        body:formdata,
+        redirect: 'follow'
+      };
+
+      fetch(`https://jslabdb.datamola.com/auth/login`, requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          localStorage.setItem('token', JSON.stringify(result));
+          if(result.error !== undefined){
+            input3.style.background = '#FFDFDF';
+            input3.value = '';
+            input3.placeholder = 'Неверный пароль';
+          }else{
+            localStorage.setItem('author', input2.value);
+            console.log(input2.value);
+            //setCurrentUser(input2.value);
+            res.user = input2.value;
+            input3.style.background = 'white';
+            input3.placeholder = '';
+            document.getElementById('message-box').style.display = 'flex';
+            let login = document.getElementById('login');
+            login.style.display = 'none';
+            setCurrentUser(input2.value);
+            document.getElementById('exit-1').style.display = 'block';
+            let hr1 = document.getElementById('mp-1');
+            hr1.style.display = 'none';
+            let hr2 = document.getElementById('mp-2');
+            hr2.style.display = 'none';
+           
+            document.querySelector('#exit-1>p>a').textContent = 'Exit';
+
+            res.getMessages(0, 10);
+          }
+         
+          console.log(result);
+        })
+        .catch(error => {
+          console.log('error', error);
+
+      });
     
 }
 
@@ -578,8 +902,9 @@ function toMainPage1(){
     let hr1 = document.getElementById('mp-1');
     hr1.style.display = 'none';
     let hr2 = document.getElementById('mp-2');
-    hr2.style.display = 'none';    
-    //document.querySelector('#exit-1>p>a').textContent = 'Exit';
+    hr2.style.display = 'none'; 
+    res.getMessages(0, 10);   
+    localStorage.setItem('author', 0);
 }
 
 function toSignUp(){
@@ -610,6 +935,15 @@ function goToChat(){
         input3.style.background = '#FFDFDF';
         return;
       }
+
+      if(input3.value.length < 6){
+        input3.style.background = '#FFDFDF';
+        input3.value = '';
+        input3.placeholder = "Не менее 6 символов";
+        input10.style.background = '#FFDFDF';
+        return;
+      }
+
       if(input10.value === ''){
         input10.style.background = '#FFDFDF';
         return;
@@ -618,75 +952,95 @@ function goToChat(){
       if( input3.value !== input10.value){
          input3.style.background = '#FFDFDF';
          input10.style.background = '#FFDFDF';
+         input10.value = '';
+         input10.placeholder = "Пароли не совпадают";
          return;
       }
-  setCurrentUser(input2.value);
-  localStorage.setItem('author', input2.value);
-  let sign = document.getElementById('sign-up');
-  sign.style.display = 'none';
-  document.getElementById('message-box').style.display = 'flex';
-  document.getElementById('mp-1').style.display = 'none';
-  document.getElementById('exit-1').style.display = 'block';
-  document.querySelector('#exit-1>p>a').textContent = 'Exit';
-  input3.value = '';
-  input2.value = '';
-  input10.value = '';
-  input10.style.background = 'white';
-  input3.style.background = 'white';
-  input2.style.background = 'white';
+  
+  res.register(input2.value, input3.value); 
 
-}
-
-function showActiveUsers(){
-  active.display(userList.activeUsers);
-  persUsView.display(userList.users);
-  localStorage.setItem('activeUsers', JSON.stringify(userList.activeUsers));
-  localStorage.setItem('users', JSON.stringify(userList.users));
+  console.log(res.token);
+  setTimeout(() =>{
+  if(res.user !== undefined){   
+    setCurrentUser(input2.value);
+    localStorage.setItem('author', input2.value);
+    let sign = document.getElementById('sign-up');
+    sign.style.display = 'none';
+    document.getElementById('message-box').style.display = 'flex';
+    document.getElementById('mp-1').style.display = 'none';
+    document.getElementById('exit-1').style.display = 'block';
+    document.querySelector('#exit-1>p>a').textContent = 'Exit';
+    input3.value = '';
+    input2.value = '';
+    input10.value = '';
+    input10.style.background = 'white';
+    input3.style.background = 'white';
+    input2.style.background = 'white';
+    res.getMessages(0, 10);
+  }else{
+      input3.style.background = '#FFDFDF';
+      input3.value = '';
+    }
+ }, 2400);
 }
 
 function setCurrentUser(user){
+    localStorage.setItem('author', user)
     view.user = user;
     model.user = user;
     header.display(user);
     view.display(model.getPage()); 
 }
 
+function errorWindow(){
+  document.getElementById('form-of-error').style.display = 'block';
+  document.getElementById('message-box').style.display = 'none';
+  document.getElementById('exit-1').style.display = 'block';
+  document.getElementById('mp-1').style.display = 'none';
+  document.getElementById('mp-2').style.display = 'none';
+}
+
 function showMessages(begin = 0, count = 10, obj = {}){
-  cotroller.filter(begin, count, model, view, obj);
+  cotroller.filter(begin, count, obj);
 }
 
 
 function addMessage(msg = {}){
-  cotroller.addMessage(msg, model, view);
+  cotroller.addMessage(msg, res, view);
+  res.getMessages();
 }
 
 function removeMessage(){
-  cotroller.removeMessage(model, view);
+  cotroller.removeMessage(res);
+  res.getMessages();
 }
 
 function editMessage(){
-  cotroller.edit(model);
+  cotroller.edit(res);
+  res.getMessages(0, 10);
 }
+
 
 function downloadMoreMessages(){
-  cotroller.downloadMoreMessages(view, model);
+  top1 += 10;
+  res.getMessages(0, top1);
 }
-
-
-
-showActiveUsers();
-removeMessage();
-editMessage();
 
 document.getElementById('login').style.display = 'none';
 document.getElementById('mp-1').style.display = 'none';
 document.getElementById('mp-2').style.display = 'none';
 document.getElementById('sign-up').style.display = 'none';
 
-cotroller.addPrivateMessage(model, view);
+cotroller.addPrivateMessage(res, view);
 cotroller.save(model, view);
+document.getElementById('form-of-error').style.display = 'none';
+setInterval(() => {
+ 
+  res.getMessages(0, top1);
+  console.log(top1);
+}, 40000);
 
+res.getUsers();
 
-
-//let res = new chatApiService('https://jslabdb.datamola.com/messages?skip=0&top=10');
-//localStorage.clear();
+editMessage();
+removeMessage();

@@ -342,6 +342,7 @@ a{
 	outline: 0 !important;
 	border-radius: 0;
 	background-color: var(--color-of-lines);
+	resize: none;
 }
 
 .button-2{
@@ -598,12 +599,39 @@ a{
 	
 	width: 61%;
 	height: 73%;
+	outline: none;
+    border: none;
 }
 
 
 #inp-2{
 	margin-left: 1.15rem;
+	outline: none;
+	border: none;
 }
+
+#in-1{
+	outline: none;
+   
+}
+
+
+#in-2{
+	outline: none;
+}
+
+#in-10{
+	outline: none; 
+}
+
+#in-11{
+	outline: none; 
+}
+
+#in-21{
+	outline: none;
+}
+
 
 .onl-user{
 	width: 10px; 
@@ -684,6 +712,30 @@ a{
 	width: 4rem;
 	border: 0;
 	outline: 0;
+}
+
+#form-of-error{
+	height: 20rem;
+	width: 28rem;
+	background-color: white;
+	margin: 0 auto;
+	text-align: center;
+	font-family: sans-serif;
+}
+
+#error{
+	font-size: 28px;
+	text-align: center;
+	padding-top: 0.8rem;
+	height: 15%;
+}
+
+#text-of-error{
+	
+}
+
+#photo-of-error{
+	padding-top: 2rem;
 }
 
 .active-users:hover .active-users-1{
