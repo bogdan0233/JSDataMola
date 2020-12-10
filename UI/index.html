@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html> 
+<head> 
+	<title>DataMola</title> 
+	<meta charset="UTF-8"> 
+	<link rel="icon" href="favicon.ico"> 
+	<link rel="stylesheet" href="style.css"> 
+</style>
+</head>
+
+</head> 
+<body class="body">
+	<header class="header" id = "header">
+		<div class="name-of-chat"><p>FlexChat</p></div>
+		<div class="name-of-user" id="user-name"><p>You are a guest</p></div>
+		<div class="exit" id = 'exit-1'><p><a href="#" onclick = "toLogIn1()">Exit</a></p></div>
+		<div class="exit" id = 'mp-1'><p><a href="#" onclick = 'toMainPage1()'>Main page</a></p></div>
+		<div class="exit" id = 'mp-2'><p><a href="#" onclick = 'toSignUp()'>Sign up</a></p></div>
+	</header> 
+	<main class="main" id ="main">
+		
+		<div class="message-box-1" id = "message-box">
+			<div class="your-messages"><p>Your messages</p></div>
+			<div class="common-chat">
+				<div class="photo-and-chat"><img src="ava.jpg"><p>Common chat</p></div>
+				<div class="chat-users"><p>Chat users</p></div>
+				<div class="users" id = "users">
+					
+				</div>
+			</div>
+			<div class="chat">
+				<div class="infa">
+					<div class="photo-and-chat-1" id="pat-1"><img src="ava.jpg"><p>Common chat</p></div>
+					<div class="number-of-users"><p>76 users, 8 guests </p>
+						<div class="active-users">
+							
+							<label class="container">Actives
+							    <input type="checkbox">
+							    <div class="checkmark" id="checkmark1">
+					            <div class="online"><p>Active:</p></div>
+					            	                  
+				            	</div>
+							</label>
+							
+						</div>
+					</div>
+
+					<div class="filters">
+						<label class="filtr"><b>Filters</b>
+							<input type="checkbox">
+					        <div class="filt-box">
+					        	<div class="filt-date" id="filt-date-1"><p>Date from:</p><input type="date" class="inp" id="inp-1"></div>
+					        	<div class="filt-date" id="filt-date-2"><p>Date to:</p><input type="date" class="inp" id="inp-2"></div>
+				                <div class="filt-date"><p>Text:</p><input type="text" class="inp" id="inp-3" placeholder="Write a text..."></div>
+				                <div class="filt-date" ><p>Author:</p><input type="text" class="inp" id="inp-4" placeholder="Write an author..."></div>
+				                <button class="ok" onclick="showMessages()">Ok</button>
+					        </div>
+						</label>
+					</div>
+				</div>
+				<div class="chat-box" id="chat-box-1">
+					<div class="download-more">
+            			<button class="button-4" onclick="downloadMoreMessages()"><p>Download more</p></button>
+          			</div>
+          		</div>	
+				<div class="send" id = "send-box">
+					<textarea type="input" name="send-box" value="" class="send-box" placeholder="Write a message" id="input"></textarea>
+					<button type="button" class="button-2" id = "send" onclick="addMessage()"><p>Send</p></button>
+				</div>
+			</div>
+		</div>	
+		<div id = 'login'>
+			<div id = 'log'><p>Log in to your account</p></div>
+			<div id = 'name'>
+				Name
+				<input type = 'input' id = 'in-1'>
+			</div>
+			<div id = 'password'>
+				Password
+				<input type = 'password' id = 'in-2'>
+			</div>
+			<div id = 'butt'>
+				<button onclick="toMainPage()" id = 'butt4'>Ok</button>
+			</div>
+		</div>
+
+		<div id = 'sign-up'>
+			<div id = 'log'><p>Sign up</p></div>
+			<div id = 'name-1'>
+				Name
+				<input type = 'input' id = 'in-10'>
+			</div>
+			<div id = 'password-1'>
+				Password
+				<input type = 'password' id = 'in-11'>
+			</div>
+			<div id = 'repeat-1'>
+				Repeat a password
+				<input type = 'password' id = 'in-21'>
+			</div>
+			<div id = 'butt-1'>
+				<button id = 'butt5' onclick="goToChat()">Ok</button>
+			</div>
+		</div>
+
+		<div id = 'form-of-error'>
+      <div id = 'error'>Error</div>
+      <div id = 'text-of-error'>Unfortunately, an error occurred on the server.
+		But our programmers are already working with 
+		this problem</div>
+      <div id = 'photo-of-error'><img src = 'sadcat.jpg'></div>
+    </div>
+		
+	</main>
+	<footer class="footer">
+		<div class="date-of-changes"><p>Date of last changes: 24.10.2020</p></div>
+		<div class="name-of-chat-1"><p>FlexChat</p></div>
+		<div class="data-of-author"><p>Bogdan Nasekailo<br>bogdan.023@mail.ru</p></div>
+	</footer>
+<script src="task.js"></script>
+</body>
+</html>
