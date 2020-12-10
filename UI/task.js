@@ -65,9 +65,12 @@ class ChatApiService{
 
     let array; 
 
-
+    this.token = JSON.parse(localStorage.getItem('token'));
+   
+    if(this.token !== null)
+      this.token = this.token.token;
     var myHeaders = new Headers();
-    myHeaders.append("Authorization", "Bearer some.token");
+    myHeaders.append("Authorization", `Bearer ${this.token}`);
 
     var requestOptions = {
       method: 'GET',
@@ -273,8 +276,19 @@ class ChatApiService{
       isPersonal: false,
     }
 
+    let array = localStorage.getItem('array');
+    array = JSON.parse(array);
+    let obj = array.find((item) => item.id === id);
+    console.log(obj);
+
     let mess = document.getElementById('input').value;
-    var raw = `{\n  \"text\": \"${mess}\",\n    \"isPersonal\": false\n  }`;
+    let raw;
+    if( obj.to === undefined){
+      raw = `{\n    \"text\": \"${mess}\",\n    \"isPersonal\": false}`;
+    }
+    else{
+      raw = `{\n    \"text\": \"${mess}\",\n    \"isPersonal\": true,\n    \"to\": \"${obj.to}\"}`;
+    }
 
     var requestOptions = {
       method: 'PUT',
@@ -433,6 +447,8 @@ class ChatController{
         res.getMessages(0, 1000);
         setTimeout(() => {
           let mess = t.parentNode.parentNode;
+          //let toAuth = t.parentNode;
+          //console.log(toAuth.previousSibling);
           let id = mess.id;
           arr = localStorage.getItem('array');
           arr = JSON.parse(arr);
@@ -643,13 +659,14 @@ class HeaderView{
 
   display(user){
       console.log(user);
-      this.containerId.style.cssText = `color: #324CA8; font-size: 24px; margin-top: 0.7rem;`;
-        if(user !== 0){
+        this.containerId.style.cssText = `color: #324CA8; font-size: 24px; margin-top: 0.7rem;`;
+        if(user !== '0' && user !== 0 && user !== 'null' && user !== null){
         this.containerId.textContent = 'Name account: ' + user;
       }else{
         this.containerId.textContent = 'You are a guest';
         document.querySelector('#exit-1>p>a').textContent = 'Log in';
-      }      
+      }    
+        
   }
 }
 
